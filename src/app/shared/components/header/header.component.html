@@ -1,3 +1,8 @@
 <header class="center">
     <h1>{{ title }}</h1>
 </header>
+<div class="split">
+    @for (stat of stats; track stat.label) {
+        <app-stat-card [stat]="stat" />
+    }
+</div>
