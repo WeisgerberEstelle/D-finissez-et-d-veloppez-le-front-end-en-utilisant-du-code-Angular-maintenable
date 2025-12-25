@@ -1,18 +1,8 @@
-<h2>Olympic games app</h2>
-<hr/>
-<div>
+  <h2>Olympic games app</h2>
+  <hr/>
   <div>
-    <app-header [title]="titlePage" />
-    <div class="split">
-      <div>
-        <p>Number of countries</p>
-        <p>{{ totalCountries }}</p>
-      </div>
-      <div>
-        <p>Number of JOs</p>
-        <p>{{ totalJOs }}</p>
-      </div>
+    <div>
+      <app-header [title]="titlePage" [stats]="stats"/>
     </div>
+    <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
   </div>
-  <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
-</div>
