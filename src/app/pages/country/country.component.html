@@ -1,20 +1,6 @@
 <div>
   <div>
-    <app-header [title]="titlePage" />
-    <div class="split">
-      <div>
-        <p>Number of entries</p>
-        <p>{{ totalEntries }}</p>
-      </div>
-      <div>
-        <p>Total Number of medals</p>
-        <p>{{ totalMedals }}</p>
-      </div>
-      <div>
-        <p>Total Number of athletes</p>
-        <p>{{ totalAthletes }}</p>
-      </div>
-    </div>
+    <app-header [title]="titlePage" [stats]="stats"/>
   </div>
   <div class="chart-container wrapper-container">
     <div class="container">
