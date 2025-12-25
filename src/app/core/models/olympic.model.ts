@@ -11,3 +11,8 @@ export interface Olympic {
     country: string;
     participations: Participation[];
 }
+
+export interface Stat {
+    label: string;
+    value: number;
+}
