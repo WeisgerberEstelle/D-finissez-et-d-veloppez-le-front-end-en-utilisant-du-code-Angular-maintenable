@@ -25,26 +25,37 @@ export class HomeComponent implements OnInit {
   constructor(private router: Router, private http:HttpClient, private olympicService: OlympicService ) { }
 
   ngOnInit() {
+    this.loadOlympicData();
+  }
+
+  private loadOlympicData(): void {
     this.olympicService.getOlympics().pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: (data: Olympic[]) => {        
-        if (data && data.length > 0) {
-          const totalJOs = this.olympicService.getUniqueYears(data).length;      
-          const countries: string[] = data.map((country: Olympic) => country.country);
-          const sumOfAllMedalsYears = data.map((country: Olympic) => 
-            this.olympicService.calculateTotalMedals(country.participations)
-          );
-          const totalCountries = countries.length;
-          this.buildStats(totalCountries, totalJOs);
-          this.buildPieChart(countries, sumOfAllMedalsYears);
-        }
-      },
-      error: (error) => {
-        console.error('Erreur :', error);
-        this.error = error.message;
-      }
+      next: (data: Olympic[]) => this.handleOlympicData(data),
+      error: (error) => this.handleError(error)
     });
+  }
+
+  private handleOlympicData(data: Olympic[]): void {  
+    if (!data || data.length === 0) {
+      return;
+    }
+
+    const totalJOs = this.olympicService.getUniqueYears(data).length;
+    const countries: string[] = data.map((country: Olympic) => country.country);
+    const totalCountries = countries.length;
+    this.buildStats(totalCountries, totalJOs);
+    
+    const sumOfAllMedalsYears = data.map((country: Olympic) => 
+      this.olympicService.calculateTotalMedals(country.participations)
+    );
+    this.buildPieChart(countries, sumOfAllMedalsYears);
+  }
+
+  private handleError(error: any): void {
+    console.error('Erreur :', error);
+    this.error = error.message;
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
