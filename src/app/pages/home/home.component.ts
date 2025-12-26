@@ -1,4 +1,3 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -22,7 +21,7 @@ export class HomeComponent implements OnInit {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private router: Router, private http:HttpClient, private olympicService: OlympicService ) { }
+  constructor(private router: Router, private olympicService: OlympicService ) { }
 
   ngOnInit() {
     this.loadOlympicData();
