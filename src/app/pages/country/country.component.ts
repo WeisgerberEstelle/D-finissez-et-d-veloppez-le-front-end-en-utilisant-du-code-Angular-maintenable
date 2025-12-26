@@ -8,8 +8,7 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
-import { Router } from 'express';
-
+import { CHART_COLORS } from '../../core/constants/chart.constants';
 
 @Component({
   selector: 'app-country',
@@ -23,12 +22,12 @@ export class CountryComponent implements OnInit {
   public titlePage: string = '';
   public stats: Stat[] = [];
   public error!: string;
+  public isLoading = true;
 
   private destroyRef = inject(DestroyRef);
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private olympicService: OlympicService
   ) { }
 
@@ -61,17 +60,18 @@ export class CountryComponent implements OnInit {
 
   private handleCountryData(data: Olympic[], countryName: string): void {    
     if (!data || data.length === 0) {
+      this.isLoading = false;
       return;
     }
     
     const selectedCountry = data.find((country: Olympic) => country.country === countryName); 
     if (!selectedCountry) {
       this.error = 'Pays non trouvé';
+      this.isLoading = false;
       return;
     }
     
-    this.titlePage = selectedCountry.country;
-        
+    this.titlePage = selectedCountry.country;    
     const participations: Participation[] = selectedCountry.participations;
     const totalEntries: number = this.olympicService.getTotalEntries(participations);
     const totalMedals: number = this.olympicService.calculateTotalMedals(participations);
@@ -81,6 +81,7 @@ export class CountryComponent implements OnInit {
     
     this.buildStats(totalEntries, totalMedals, totalAthletes);
     this.buildChart(years, medals);
+    this.isLoading = false;
   }
 
   private buildChart(years: number[], medals: number[]): void {
@@ -91,7 +92,7 @@ export class CountryComponent implements OnInit {
         datasets: [{
           label: 'medals',
           data: medals,
-          backgroundColor: '#0b868f'
+          backgroundColor: CHART_COLORS[0]
         }]
       },
       options: {
@@ -123,7 +124,7 @@ export class CountryComponent implements OnInit {
   }
   
   private handleError(error: any): void {
-    console.error('Erreur:', error);
     this.error = error.message;
+    this.isLoading = false;
   }
 }
