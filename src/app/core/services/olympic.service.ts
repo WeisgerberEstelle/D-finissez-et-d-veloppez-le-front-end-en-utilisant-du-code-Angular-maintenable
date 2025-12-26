@@ -19,4 +19,13 @@ export class OlympicService {
       })
     );
   }
+
+  getUniqueYears(olympics: Olympic[]): number[] {
+    const allYears = olympics.flatMap(o => o.participations.map(p => p.year));
+    return [...new Set(allYears)].sort((a, b) => a - b);
+  }
+
+  calculateTotalMedals(participations: Participation[]): number {
+    return participations.reduce((sum, p) => sum + p.medalsCount, 0);
+  }
 }

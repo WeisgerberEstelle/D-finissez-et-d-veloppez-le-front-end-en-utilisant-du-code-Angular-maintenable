@@ -27,18 +27,10 @@ export class HomeComponent implements OnInit {
     this.olympicService.getOlympics().subscribe({
       next: (data: Olympic[]) => {        
         if (data && data.length > 0) {
-          const totalJOs = Array.from(new Set(
-            data.map((country: Olympic) => 
-              country.participations.map((p) => p.year)
-            ).flat()
-          )).length;
-          
+          const totalJOs = this.olympicService.getUniqueYears(data).length;      
           const countries: string[] = data.map((country: Olympic) => country.country);
-          const medals = data.map((country: Olympic) => 
-            country.participations.map((p) => p.medalsCount)
-          );
-          const sumOfAllMedalsYears = medals.map((medalArray: number[]) => 
-            medalArray.reduce((sum: number, count: number) => sum + count, 0)
+          const sumOfAllMedalsYears = data.map((country: Olympic) => 
+            this.olympicService.calculateTotalMedals(country.participations)
           );
           const totalCountries = countries.length;
           this.buildStats(totalCountries, totalJOs);
