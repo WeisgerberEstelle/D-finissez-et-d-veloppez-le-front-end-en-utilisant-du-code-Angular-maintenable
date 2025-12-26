@@ -1,5 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, RouterLink} from '@angular/router';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { CommonModule } from '@angular/common';
 
@@ -22,17 +23,23 @@ export class CountryComponent implements OnInit {
   public stats: Stat[] = [];
   public error!: string;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private route: ActivatedRoute, private olympicService: OlympicService) {
   }
 
   ngOnInit() {
     let countryName: string | null = null;
     
-    this.route.paramMap.subscribe((param: ParamMap) => {
+    this.route.paramMap.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((param: ParamMap) => {
       countryName = param.get('countryName');
     });
   
-    this.olympicService.getOlympics().subscribe({
+    this.olympicService.getOlympics().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (data: Olympic[]) => {
         if (data && data.length > 0) {
           const selectedCountry = data.find((country: Olympic) => country.country === countryName);
