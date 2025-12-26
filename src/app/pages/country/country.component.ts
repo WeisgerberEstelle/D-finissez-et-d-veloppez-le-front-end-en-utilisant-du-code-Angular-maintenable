@@ -9,13 +9,14 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
 import { CHART_COLORS } from '../../core/constants/chart.constants';
+import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss'],
   standalone: true,
-  imports: [HeaderComponent, RouterLink, CommonModule ]
+  imports: [HeaderComponent, RouterLink, CommonModule, SpinnerComponent]
 })
 export class CountryComponent implements OnInit {
   public lineChart!: Chart<'line', number[], number>;
