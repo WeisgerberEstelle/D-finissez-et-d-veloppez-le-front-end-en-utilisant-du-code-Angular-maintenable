@@ -17,7 +17,7 @@ import { Olympic, Participation } from '../../core/models/olympic.model';
   imports: [HeaderComponent, RouterLink, CommonModule ]
 })
 export class CountryComponent implements OnInit {
-  public lineChart!: Chart<"line", string[], number>;
+  public lineChart!: Chart<"line", number[], number>;
   public titlePage: string = '';
   public stats: Stat[] = [];
   public error!: string;
@@ -33,22 +33,23 @@ export class CountryComponent implements OnInit {
     });
   
     this.olympicService.getOlympics().subscribe({
-      next: (data: Olympic[]) => {        
+      next: (data: Olympic[]) => {
         if (data && data.length > 0) {
-          const selectedCountry = data.find((i: any) => i.country === countryName);
+          const selectedCountry = data.find((country: Olympic) => country.country === countryName);
           if (!selectedCountry) {
             console.error('Pays non trouvé');
             return;
           }
           
           this.titlePage = selectedCountry.country;
-          const participations = selectedCountry?.participations.map((i: any) => i);
-          const totalEntries = participations?.length ?? 0;
-          const years = selectedCountry?.participations.map((i: any) => i.year) ?? [];
-          const medals = selectedCountry?.participations.map((i: any) => i.medalsCount.toString()) ?? [];
-          const totalMedals = medals.reduce((accumulator: any, item: any) => accumulator + parseInt(item), 0);
-          const nbAthletes = selectedCountry?.participations.map((i: any) => i.athleteCount.toString()) ?? [];
-          const totalAthletes = nbAthletes.reduce((accumulator: any, item: any) => accumulator + parseInt(item), 0);
+          const participations: Participation[] = selectedCountry.participations;
+          const totalEntries: number = participations.length;
+          const years: number[] = participations.map((p: Participation) => p.year);
+          const medals: number[] = participations.map((p: Participation) => p.medalsCount);
+          const totalMedals:number = medals.reduce((sum: number, count: number) => sum + count, 0);
+          const athletes: number[] = participations.map((p: Participation) => p.athleteCount);
+          const totalAthletes: number = athletes.reduce((sum: number, count: number) => sum + count, 0);
+          
           this.buildStats(totalEntries, totalMedals, totalAthletes);
           this.buildChart(years, medals);
         }
@@ -60,7 +61,7 @@ export class CountryComponent implements OnInit {
     });
   }
 
-  buildChart(years: number[], medals: string[]) {
+  buildChart(years: number[], medals: number[]) {
     const lineChart = new Chart("countryChart", {
       type: 'line',
       data: {
