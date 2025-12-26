@@ -54,7 +54,6 @@ export class HomeComponent implements OnInit {
   }
 
   private handleError(error: any): void {
-    console.error('Erreur :', error);
     this.error = error.message;
   }
 
