@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic, Stat } from 'src/app/core/models/olympic.model';
@@ -24,7 +25,9 @@ export class HomeComponent implements OnInit {
   constructor(private router: Router, private http:HttpClient, private olympicService: OlympicService ) { }
 
   ngOnInit() {
-    this.olympicService.getOlympics().subscribe({
+    this.olympicService.getOlympics().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (data: Olympic[]) => {        
         if (data && data.length > 0) {
           const totalJOs = this.olympicService.getUniqueYears(data).length;      
