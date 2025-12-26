@@ -5,19 +5,22 @@ import Chart from 'chart.js/auto';
 import { Olympic, Stat } from 'src/app/core/models/olympic.model';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
+import { CHART_COLORS } from 'src/app/core/constants/chart.constants';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone: true,
-  imports: [HeaderComponent]
+  imports: [HeaderComponent, SpinnerComponent]
 })
 export class HomeComponent implements OnInit {
   public pieChart!: Chart<"pie", number[], string>;
   public error!:string
   public titlePage: string = "Medals per Country";
   public stats: Stat[] = [];
+  public isLoading = true;
 
   private destroyRef = inject(DestroyRef);
 
@@ -38,6 +41,7 @@ export class HomeComponent implements OnInit {
 
   private handleOlympicData(data: Olympic[]): void {  
     if (!data || data.length === 0) {
+      this.isLoading = false;
       return;
     }
 
@@ -50,10 +54,12 @@ export class HomeComponent implements OnInit {
       this.olympicService.calculateTotalMedals(country.participations)
     );
     this.buildPieChart(countries, sumOfAllMedalsYears);
+    this.isLoading = false;
   }
 
   private handleError(error: any): void {
     this.error = error.message;
+    this.isLoading = false;
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
@@ -64,7 +70,7 @@ export class HomeComponent implements OnInit {
         datasets: [{
           label: 'Medals',
           data: sumOfAllMedalsYears,
-          backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', 'orange', '#94819d'],
+          backgroundColor: CHART_COLORS.slice(0, countries.length),
           hoverOffset: 4
         }],
       },
@@ -96,6 +102,6 @@ export class HomeComponent implements OnInit {
         value: totalJOs
       }
     ];
-  }  
+  }
 }
 

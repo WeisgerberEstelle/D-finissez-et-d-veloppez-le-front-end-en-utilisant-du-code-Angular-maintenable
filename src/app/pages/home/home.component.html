@@ -1,8 +1,15 @@
-  <h2>Olympic games app</h2>
-  <hr/>
-  <div>
-    <div>
-      <app-header [title]="titlePage" [stats]="stats"/>
+<h2>Olympic games app</h2>
+<hr />
+<div>
+  <app-header [title]="titlePage" [stats]="stats"></app-header>
+  @if (isLoading) {
+    <div class="center">
+      <app-spinner></app-spinner>
     </div>
-    <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
-  </div>
+  } @else if (error) {
+    <div class="error-block">
+      <p>{{ error }}</p>
+    </div>
+  }
+  <canvas id="DashboardPieChart"></canvas>
+</div>
