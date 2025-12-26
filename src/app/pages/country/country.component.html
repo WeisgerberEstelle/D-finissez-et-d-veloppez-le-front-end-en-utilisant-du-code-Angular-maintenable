@@ -2,6 +2,7 @@
   <div>
     <app-header [title]="titlePage" [stats]="stats"/>
   </div>
+  
   @if (isLoading) {
     <div class="center">
       <app-spinner></app-spinner>
@@ -11,15 +12,21 @@
       <p>{{ error }}</p>
       <button routerLink="">Back to Home</button>
     </div>
-  }
-
-  <div class="chart-container wrapper-container">
-    <div class="container">
-      <canvas id="countryChart">{{ lineChart }}</canvas>
-      <h2>Date</h2>
+  } @else {
+    <div class="chart-container wrapper-container">
+      <div class="container">
+        <app-chart 
+          type="line"
+          [labels]="chartLabels"
+          [data]="chartData"
+          label="Medals">
+        </app-chart>
+        <h2>Date</h2>
+      </div>
     </div>
-  </div>
-  <div class="center">
-    <button routerLink="">Back to Home</button>
-  </div>
+    
+    <div class="center">
+      <button routerLink="">Back to Home</button>
+    </div>
+  }
 </div>

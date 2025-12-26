@@ -10,20 +10,29 @@ import { Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
 import { CHART_COLORS } from '../../core/constants/chart.constants';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
+import { ChartComponent } from 'src/app/shared/components/chart/chart.component';
 
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss'],
   standalone: true,
-  imports: [HeaderComponent, RouterLink, CommonModule, SpinnerComponent],
+  imports: [
+    HeaderComponent, 
+    RouterLink, 
+    CommonModule, 
+    SpinnerComponent,
+    ChartComponent
+  ],
 })
 export class CountryComponent implements OnInit {
-  public lineChart!: Chart<'line', number[], number>;
   public titlePage: string = '';
   public stats: Stat[] = [];
   public error!: string;
   public isLoading = true;
+
+  public chartLabels: number[] = [];
+  public chartData: number[] = [];
 
   private destroyRef = inject(DestroyRef);
 
@@ -69,48 +78,23 @@ export class CountryComponent implements OnInit {
     const selectedCountry = data.find(
       (country: Olympic) => country.country === countryName
     );
+
     if (!selectedCountry) {
-      this.error = 'Pays non trouvé';
+      this.error = 'Country not found';
       this.isLoading = false;
       return;
     }
 
     this.titlePage = selectedCountry.country;
     const participations: Participation[] = selectedCountry.participations;
-    const totalEntries: number =
-      this.olympicService.getTotalEntries(participations);
-    const totalMedals: number =
-      this.olympicService.calculateTotalMedals(participations);
-    const totalAthletes: number =
-      this.olympicService.calculateTotalAthletes(participations);
-    const years: number[] = participations.map((p: Participation) => p.year);
-    const medals: number[] = participations.map(
-      (p: Participation) => p.medalsCount
-    );
-
+    const totalEntries: number = this.olympicService.getTotalEntries(participations);
+    const totalMedals: number = this.olympicService.calculateTotalMedals(participations);
+    const totalAthletes: number = this.olympicService.calculateTotalAthletes(participations);
     this.buildStats(totalEntries, totalMedals, totalAthletes);
-    this.buildChart(years, medals);
-    this.isLoading = false;
-  }
 
-  private buildChart(years: number[], medals: number[]): void {
-    const lineChart = new Chart('countryChart', {
-      type: 'line',
-      data: {
-        labels: years,
-        datasets: [
-          {
-            label: 'medals',
-            data: medals,
-            backgroundColor: CHART_COLORS[0],
-          },
-        ],
-      },
-      options: {
-        aspectRatio: 2.5,
-      },
-    });
-    this.lineChart = lineChart;
+    this.chartLabels = participations.map((p: Participation) => p.year);
+    this.chartData = participations.map((p: Participation) => p.medalsCount);
+    this.isLoading = false;
   }
 
   private buildStats(
