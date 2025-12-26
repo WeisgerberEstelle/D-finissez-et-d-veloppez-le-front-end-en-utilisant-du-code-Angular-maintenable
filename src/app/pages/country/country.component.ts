@@ -42,13 +42,13 @@ export class CountryComponent implements OnInit {
           }
           
           this.titlePage = selectedCountry.country;
+
           const participations: Participation[] = selectedCountry.participations;
-          const totalEntries: number = participations.length;
+          const totalEntries: number = this.olympicService.getTotalEntries(participations);
+          const totalMedals: number = this.olympicService.calculateTotalMedals(participations);
+          const totalAthletes: number = this.olympicService.calculateTotalAthletes(participations);
           const years: number[] = participations.map((p: Participation) => p.year);
           const medals: number[] = participations.map((p: Participation) => p.medalsCount);
-          const totalMedals:number = medals.reduce((sum: number, count: number) => sum + count, 0);
-          const athletes: number[] = participations.map((p: Participation) => p.athleteCount);
-          const totalAthletes: number = athletes.reduce((sum: number, count: number) => sum + count, 0);
           
           this.buildStats(totalEntries, totalMedals, totalAthletes);
           this.buildChart(years, medals);
