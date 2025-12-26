@@ -2,6 +2,7 @@
 <hr />
 <div>
   <app-header [title]="titlePage" [stats]="stats"></app-header>
+  
   @if (isLoading) {
     <div class="center">
       <app-spinner></app-spinner>
@@ -9,7 +10,17 @@
   } @else if (error) {
     <div class="error-block">
       <p>{{ error }}</p>
+      <button (click)="reloadPage()">
+        Reload Page
+      </button>
     </div>
+  } @else {
+    <app-chart 
+      type="pie"
+      [labels]="chartLabels"
+      [data]="chartData"
+      label="Medals"
+      (chartClick)="onCountryClick($event)">
+    </app-chart>
   }
-  <canvas id="DashboardPieChart"></canvas>
 </div>
