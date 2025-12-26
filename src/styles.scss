@@ -30,6 +30,11 @@
         color: gray;
         margin: 0px;
 
+        dd,dt {
+            margin-inline: auto;
+            text-align: center;
+        }
+          
         p {
             text-align: center;
             margin: 0;
