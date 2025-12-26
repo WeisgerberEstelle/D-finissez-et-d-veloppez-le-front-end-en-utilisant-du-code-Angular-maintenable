@@ -1,10 +1,12 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterLink} from '@angular/router';
 import Chart from 'chart.js/auto';
-import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { CommonModule } from '@angular/common';
+
+import { OlympicService } from 'src/app/core/services/olympic.service';
+import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { Stat } from 'src/app/core/models/olympic.model';
+import { Olympic, Participation } from '../../core/models/olympic.model';
 
 
 @Component({
@@ -15,38 +17,47 @@ import { Stat } from 'src/app/core/models/olympic.model';
   imports: [HeaderComponent, RouterLink, CommonModule ]
 })
 export class CountryComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
   public lineChart!: Chart<"line", string[], number>;
   public titlePage: string = '';
   public stats: Stat[] = [];
   public error!: string;
 
-  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
+  constructor(private route: ActivatedRoute, private olympicService: OlympicService) {
   }
 
   ngOnInit() {
-    let countryName: string | null = null
-    this.route.paramMap.subscribe((param: ParamMap) => countryName = param.get('countryName'));
-    this.http.get<any[]>(this.olympicUrl).pipe().subscribe(
-      (data) => {
+    let countryName: string | null = null;
+    
+    this.route.paramMap.subscribe((param: ParamMap) => {
+      countryName = param.get('countryName');
+    });
+  
+    this.olympicService.getOlympics().subscribe({
+      next: (data: Olympic[]) => {        
         if (data && data.length > 0) {
           const selectedCountry = data.find((i: any) => i.country === countryName);
+          if (!selectedCountry) {
+            console.error('Pays non trouvé');
+            return;
+          }
+          
           this.titlePage = selectedCountry.country;
           const participations = selectedCountry?.participations.map((i: any) => i);
           const totalEntries = participations?.length ?? 0;
           const years = selectedCountry?.participations.map((i: any) => i.year) ?? [];
           const medals = selectedCountry?.participations.map((i: any) => i.medalsCount.toString()) ?? [];
           const totalMedals = medals.reduce((accumulator: any, item: any) => accumulator + parseInt(item), 0);
-          const nbAthletes = selectedCountry?.participations.map((i: any) => i.athleteCount.toString()) ?? []
+          const nbAthletes = selectedCountry?.participations.map((i: any) => i.athleteCount.toString()) ?? [];
           const totalAthletes = nbAthletes.reduce((accumulator: any, item: any) => accumulator + parseInt(item), 0);
           this.buildStats(totalEntries, totalMedals, totalAthletes);
           this.buildChart(years, medals);
         }
       },
-      (error: HttpErrorResponse) => {
-        this.error = error.message
+      error: (error) => {
+        console.error('Erreur:', error);
+        this.error = error.message;
       }
-    );
+    });
   }
 
   buildChart(years: number[], medals: string[]) {
