@@ -1,8 +1,9 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Stat } from 'src/app/core/models/olympic.model';
+import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
 @Component({
@@ -16,30 +17,31 @@ export class HomeComponent implements OnInit {
   private olympicUrl = './assets/mock/olympic.json';
   public pieChart!: Chart<"pie", number[], string>;
   public error!:string
-  titlePage: string = "Medals per Country";
+  public titlePage: string = "Medals per Country";
   public stats: Stat[] = [];
 
-  constructor(private router: Router, private http:HttpClient) { }
+  private destroyRef = inject(DestroyRef);
+
+  constructor(private router: Router, private http:HttpClient, private olympicService: OlympicService ) { }
 
   ngOnInit() {
-    this.http.get<any[]>(this.olympicUrl).pipe().subscribe(
-      (data) => {
-        console.log(`Liste des données : ${JSON.stringify(data)}`);
+    this.olympicService.getOlympics().subscribe({
+      next: (data) => {        
         if (data && data.length > 0) {
           const totalJOs = Array.from(new Set(data.map((i: any) => i.participations.map((f: any) => f.year)).flat())).length;
           const countries: string[] = data.map((i: any) => i.country);
           const totalCountries = countries.length;
-          this.buildStats(totalCountries, totalJOs)
+          this.buildStats(totalCountries, totalJOs);
           const medals = data.map((i: any) => i.participations.map((i: any) => (i.medalsCount)));
           const sumOfAllMedalsYears = medals.map((i) => i.reduce((acc: any, i: any) => acc + i, 0));
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
       },
-      (error:HttpErrorResponse) => {
-        console.log(`erreur : ${error}`);
-        this.error = error.message
+      error: (error) => {
+        console.error('Erreur :', error);
+        this.error = error.message;
       }
-    )
+    });
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
