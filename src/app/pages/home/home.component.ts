@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
-import { Stat } from 'src/app/core/models/olympic.model';
+import { Olympic, Stat } from 'src/app/core/models/olympic.model';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
@@ -14,7 +14,6 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   imports: [HeaderComponent]
 })
 export class HomeComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
   public pieChart!: Chart<"pie", number[], string>;
   public error!:string
   public titlePage: string = "Medals per Country";
@@ -26,14 +25,23 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.olympicService.getOlympics().subscribe({
-      next: (data) => {        
+      next: (data: Olympic[]) => {        
         if (data && data.length > 0) {
-          const totalJOs = Array.from(new Set(data.map((i: any) => i.participations.map((f: any) => f.year)).flat())).length;
-          const countries: string[] = data.map((i: any) => i.country);
+          const totalJOs = Array.from(new Set(
+            data.map((country: Olympic) => 
+              country.participations.map((p) => p.year)
+            ).flat()
+          )).length;
+          
+          const countries: string[] = data.map((country: Olympic) => country.country);
+          const medals = data.map((country: Olympic) => 
+            country.participations.map((p) => p.medalsCount)
+          );
+          const sumOfAllMedalsYears = medals.map((medalArray: number[]) => 
+            medalArray.reduce((sum: number, count: number) => sum + count, 0)
+          );
           const totalCountries = countries.length;
           this.buildStats(totalCountries, totalJOs);
-          const medals = data.map((i: any) => i.participations.map((i: any) => (i.medalsCount)));
-          const sumOfAllMedalsYears = medals.map((i) => i.reduce((acc: any, i: any) => acc + i, 0));
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
       },
