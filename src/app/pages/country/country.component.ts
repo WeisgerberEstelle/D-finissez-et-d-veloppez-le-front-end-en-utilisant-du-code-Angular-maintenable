@@ -16,7 +16,7 @@ import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.comp
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss'],
   standalone: true,
-  imports: [HeaderComponent, RouterLink, CommonModule, SpinnerComponent]
+  imports: [HeaderComponent, RouterLink, CommonModule, SpinnerComponent],
 })
 export class CountryComponent implements OnInit {
   public lineChart!: Chart<'line', number[], number>;
@@ -30,7 +30,7 @@ export class CountryComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private olympicService: OlympicService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadCountryData();
@@ -38,48 +38,56 @@ export class CountryComponent implements OnInit {
 
   private loadCountryData(): void {
     let countryName: string | null = null;
-    
-    this.route.paramMap.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((param: ParamMap) => {
-      countryName = param.get('countryName');
-      
-      if (countryName) {
-        this.fetchCountryDetails(countryName);
-      }
-    });
+
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((param: ParamMap) => {
+        countryName = param.get('countryName');
+
+        if (countryName) {
+          this.fetchCountryDetails(countryName);
+        }
+      });
   }
 
   private fetchCountryDetails(countryName: string): void {
-    this.olympicService.getOlympics().pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data: Olympic[]) => this.handleCountryData(data, countryName),
-      error: (error) => this.handleError(error)
-    });
+    this.olympicService
+      .getOlympics()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: Olympic[]) => this.handleCountryData(data, countryName),
+        error: (error) => this.handleError(error),
+      });
   }
 
-  private handleCountryData(data: Olympic[], countryName: string): void {    
+  private handleCountryData(data: Olympic[], countryName: string): void {
     if (!data || data.length === 0) {
       this.isLoading = false;
       return;
     }
-    
-    const selectedCountry = data.find((country: Olympic) => country.country === countryName); 
+
+    const selectedCountry = data.find(
+      (country: Olympic) => country.country === countryName
+    );
     if (!selectedCountry) {
       this.error = 'Pays non trouvé';
       this.isLoading = false;
       return;
     }
-    
-    this.titlePage = selectedCountry.country;    
+
+    this.titlePage = selectedCountry.country;
     const participations: Participation[] = selectedCountry.participations;
-    const totalEntries: number = this.olympicService.getTotalEntries(participations);
-    const totalMedals: number = this.olympicService.calculateTotalMedals(participations);
-    const totalAthletes: number = this.olympicService.calculateTotalAthletes(participations);
+    const totalEntries: number =
+      this.olympicService.getTotalEntries(participations);
+    const totalMedals: number =
+      this.olympicService.calculateTotalMedals(participations);
+    const totalAthletes: number =
+      this.olympicService.calculateTotalAthletes(participations);
     const years: number[] = participations.map((p: Participation) => p.year);
-    const medals: number[] = participations.map((p: Participation) => p.medalsCount);
-    
+    const medals: number[] = participations.map(
+      (p: Participation) => p.medalsCount
+    );
+
     this.buildStats(totalEntries, totalMedals, totalAthletes);
     this.buildChart(years, medals);
     this.isLoading = false;
@@ -90,15 +98,17 @@ export class CountryComponent implements OnInit {
       type: 'line',
       data: {
         labels: years,
-        datasets: [{
-          label: 'medals',
-          data: medals,
-          backgroundColor: CHART_COLORS[0]
-        }]
+        datasets: [
+          {
+            label: 'medals',
+            data: medals,
+            backgroundColor: CHART_COLORS[0],
+          },
+        ],
       },
       options: {
-        aspectRatio: 2.5
-      }
+        aspectRatio: 2.5,
+      },
     });
     this.lineChart = lineChart;
   }
@@ -111,19 +121,19 @@ export class CountryComponent implements OnInit {
     this.stats = [
       {
         label: 'Total number of participations',
-        value: totalEntries
+        value: totalEntries,
       },
       {
         label: 'Number of medals',
-        value: totalMedals
+        value: totalMedals,
       },
       {
         label: 'Total number of athletes',
-        value: totalAthletes
-      }
+        value: totalAthletes,
+      },
     ];
   }
-  
+
   private handleError(error: any): void {
     this.error = error.message;
     this.isLoading = false;
