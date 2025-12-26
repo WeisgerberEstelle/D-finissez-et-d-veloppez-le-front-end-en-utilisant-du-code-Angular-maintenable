@@ -28,4 +28,24 @@ export class OlympicService {
   calculateTotalMedals(participations: Participation[]): number {
     return participations.reduce((sum, p) => sum + p.medalsCount, 0);
   }
+
+  getCountryByName(countryName: string): Observable<Olympic | undefined> {
+    return this.getOlympics().pipe(
+      map(olympics => olympics.find(o => o.country === countryName))
+    );
+  }
+
+  countryExists(countryName: string): Observable<boolean> {
+    return this.getCountryByName(countryName).pipe(
+      map(country => !!country)
+    );
+  }
+
+  calculateTotalAthletes(participations: Participation[]): number {
+    return participations.reduce((sum, p) => sum + p.athleteCount, 0);
+  }
+
+  getTotalEntries(participations: Participation[]): number {
+    return participations.length;
+  }
 }
