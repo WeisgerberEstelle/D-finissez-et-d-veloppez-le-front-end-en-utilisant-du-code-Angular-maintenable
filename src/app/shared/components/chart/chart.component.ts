@@ -10,10 +10,11 @@ import {
 } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { CHART_COLORS, CHART_CONFIG } from '../../../core/constants/chart.constants';
+import { ChartItem } from 'src/app/core/models/olympic.model';
 
 export interface ChartClickEvent {
   index: number;
-  label: string | number;
+  item: ChartItem;
 }
 
 @Component({
@@ -26,15 +27,15 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas') chartCanvas?: ElementRef<HTMLCanvasElement>;
 
   @Input() type: 'line' | 'pie' = 'line';
-  @Input() labels: (string | number)[] = [];
-  @Input() data: number[] = [];
-  @Input() label: string = 'Data';
+  @Input() chartData: ChartItem[] = [];
+  @Input() label: string = 'Medals';
 
   @Output() chartClick = new EventEmitter<ChartClickEvent>();
 
   private chart?: Chart;
+
   ngAfterViewInit(): void {
-    if (this.labels.length > 0 && this.data.length > 0) {
+    if (this.chartData.length > 0) {
       this.buildChart();
     }
   }
@@ -50,15 +51,18 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     if (!ctx) return;
     this.chart?.destroy();
 
+    const labels = this.chartData.map(chartItem => chartItem.label);
+    const data = this.chartData.map(chartItem => chartItem.value);
+
     const config: any = {
       type: this.type,
       data: {
-        labels: this.labels,
+        labels,
         datasets: [{
           label: this.label,
-          data: this.data,
+          data,
           backgroundColor: this.type === 'pie' 
-            ? CHART_COLORS.slice(0, this.labels.length)
+            ? CHART_COLORS.slice(0, labels.length)
             : CHART_COLORS[0]
         }]
       },
@@ -74,11 +78,17 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     if (this.type === 'pie') {
       config.data.datasets[0].hoverOffset = 4;
       config.options.onClick = (e: any) => {
-        const points = this.chart!.getElementsAtEventForMode(e, 'point', { intersect: true }, true);
+        const points = this.chart!.getElementsAtEventForMode(
+          e,
+          'point',
+          { intersect: true },
+          true
+        );
+
         if (points.length) {
           const index = points[0].index;
-          const label = this.labels[index];
-          this.chartClick.emit({ index, label });
+          const item = this.chartData[index];
+          this.chartClick.emit({ index, item });
         }
       };
     }
@@ -89,5 +99,4 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   private isMobile(): boolean {
     return window.innerWidth <= 1000;
   }
-  
 }
