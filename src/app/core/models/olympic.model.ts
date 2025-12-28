@@ -16,3 +16,8 @@ export interface Stat {
     label: string;
     value: number;
 }
+
+export interface ChartItem {
+    label: number|string;
+    value: number;
+}
