@@ -11,9 +11,6 @@ import {
 import Chart from 'chart.js/auto';
 import { CHART_COLORS, CHART_CONFIG } from '../../../core/constants/chart.constants';
 
-/**
- * Interface pour les événements de clic sur le graphique
- */
 export interface ChartClickEvent {
   index: number;
   label: string | number;
@@ -36,7 +33,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   @Output() chartClick = new EventEmitter<ChartClickEvent>();
 
   private chart?: Chart;
-
   ngAfterViewInit(): void {
     if (this.labels.length > 0 && this.data.length > 0) {
       this.buildChart();
@@ -47,9 +43,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.chart?.destroy();
   }
 
-  private buildChart(): void {
-    if (!this.chartCanvas) return;
+  public buildChart(): void {
 
+    if (!this.chartCanvas) return;
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
     this.chart?.destroy();
@@ -68,9 +64,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       },
       options: {
         responsive: CHART_CONFIG.responsive,
-        maintainAspectRatio: CHART_CONFIG.maintainAspectRatio,
-        aspectRatio: CHART_CONFIG.aspectRatio.default
-      }
+        maintainAspectRatio: true,
+        aspectRatio: this.isMobile()
+          ? CHART_CONFIG.aspectRatio[this.type].mobile
+          : CHART_CONFIG.aspectRatio[this.type].default
+      }      
     };
 
     if (this.type === 'pie') {
@@ -87,4 +85,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
     this.chart = new Chart(ctx, config);
   }
+
+  private isMobile(): boolean {
+    return window.innerWidth <= 1000;
+  }
+  
 }
