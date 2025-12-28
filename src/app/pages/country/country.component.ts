@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { Stat } from 'src/app/core/models/olympic.model';
+import { ChartItem, Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
 import { CHART_COLORS } from '../../core/constants/chart.constants';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
@@ -31,8 +31,7 @@ export class CountryComponent implements OnInit {
   public error!: string;
   public isLoading = true;
 
-  public chartLabels: number[] = [];
-  public chartData: number[] = [];
+  public chartData: ChartItem[] = [];
 
   private destroyRef = inject(DestroyRef);
 
@@ -91,9 +90,11 @@ export class CountryComponent implements OnInit {
     const totalMedals: number = this.olympicService.calculateTotalMedals(participations);
     const totalAthletes: number = this.olympicService.calculateTotalAthletes(participations);
     this.buildStats(totalEntries, totalMedals, totalAthletes);
-
-    this.chartLabels = participations.map((p: Participation) => p.year);
-    this.chartData = participations.map((p: Participation) => p.medalsCount);
+    this.chartData = participations.map((p: Participation) => ({
+      label: p.year,
+      value: p.medalsCount
+    }));
+    
     this.isLoading = false;
   }
 

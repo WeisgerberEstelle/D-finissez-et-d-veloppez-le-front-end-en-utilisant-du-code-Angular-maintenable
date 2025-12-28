@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Olympic, Stat } from 'src/app/core/models/olympic.model';
+import { ChartItem, Olympic, Stat } from 'src/app/core/models/olympic.model';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
   public isLoading = true;
 
   public chartLabels: string[] = [];
-  public chartData: number[] = [];
+  public chartData: ChartItem[] = [];
 
   private destroyRef = inject(DestroyRef);
 
@@ -50,15 +50,17 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    const totalJOs = this.olympicService.getUniqueYears(data).length;
-    const totalCountries = data.length;
+    const totalJOs: number = this.olympicService.getUniqueYears(data).length;
+    const totalCountries: number = data.length;
 
     this.buildStats(totalCountries, totalJOs);
 
-    this.chartLabels = data.map((country: Olympic) => country.country);
-    this.chartData = data.map((country: Olympic) =>
-      this.olympicService.calculateTotalMedals(country.participations)
-    );
+    this.chartData = data
+    .map((country: Olympic) => ({
+      label: country.country,
+      value: this.olympicService.calculateTotalMedals(country.participations)
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
     this.isLoading = false;
   }
@@ -82,7 +84,7 @@ export class HomeComponent implements OnInit {
   }
 
   public onCountryClick(event: ChartClickEvent): void {
-    this.router.navigate(['country', event.label]);
+    this.router.navigate(['country', event.item.label]);
   }
 
   public reloadPage(): void {

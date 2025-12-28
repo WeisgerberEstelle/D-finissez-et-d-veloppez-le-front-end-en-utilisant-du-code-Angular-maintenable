@@ -22,8 +22,7 @@
     <figure>
       <app-chart 
         type="pie"
-        [labels]="chartLabels"
-        [data]="chartData"
+        [chartData]="chartData"
         label="Medals"
         (chartClick)="onCountryClick($event)">
       </app-chart>
