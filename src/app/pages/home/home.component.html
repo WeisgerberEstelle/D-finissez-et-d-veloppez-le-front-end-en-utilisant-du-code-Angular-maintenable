@@ -14,6 +14,10 @@
         Reload Page
       </button>
     </div>
+  } @else if (chartData.length === 0) {
+    <div class="center">
+      <p>No data</p>
+    </div>
   } @else {
     <figure>
       <app-chart 
@@ -23,7 +27,9 @@
         label="Medals"
         (chartClick)="onCountryClick($event)">
       </app-chart>
-      <figcaption class="center">Medal distribution by country at the Olympic Games</figcaption>
+      <figcaption class="center">
+        Medal distribution by country at the Olympic Games
+      </figcaption>
     </figure>
   }
 </div>

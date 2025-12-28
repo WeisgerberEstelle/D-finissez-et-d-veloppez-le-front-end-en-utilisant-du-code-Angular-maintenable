@@ -12,6 +12,10 @@
       <p>{{ error }}</p>
       <button routerLink="">Back to Home</button>
     </div>
+  } @else if (chartData.length === 0) {
+    <div class="center">
+      <p>No data</p>
+    </div>
   } @else {
     <div class="chart-container wrapper-container">
       <figure class="container">
