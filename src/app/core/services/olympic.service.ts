@@ -26,7 +26,7 @@ export class OlympicService {
   }
 
   calculateTotalMedals(participations: Participation[]): number {
-    return participations.reduce((sum, p) => sum + p.medalsCount, 0);
+    return participations.reduce((sum, p) => sum + (p.medalsCount ?? 0), 0);
   }
 
   getCountryByName(countryName: string): Observable<Olympic | undefined> {
