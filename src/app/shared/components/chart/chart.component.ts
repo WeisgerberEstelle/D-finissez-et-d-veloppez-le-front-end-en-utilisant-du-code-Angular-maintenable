@@ -8,7 +8,11 @@ import {
   AfterViewInit, 
   OnDestroy
 } from '@angular/core';
-import Chart from 'chart.js/auto';
+import {
+  Chart,
+  ChartConfiguration,
+} from 'chart.js/auto';
+
 import { CHART_COLORS, CHART_CONFIG } from '../../../core/constants/chart.constants';
 import { ChartItem } from 'src/app/core/models/olympic.model';
 
@@ -44,17 +48,18 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.chart?.destroy();
   }
 
-  public buildChart(): void {
-
+  private buildChart(): void {
     if (!this.chartCanvas) return;
+  
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
+  
     this.chart?.destroy();
-
-    const labels = this.chartData.map(chartItem => chartItem.label);
-    const data = this.chartData.map(chartItem => chartItem.value);
-
-    const config: any = {
+  
+    const labels = this.chartData.map(d => d.label);
+    const data = this.chartData.map(d => d.value);
+  
+    const config: ChartConfiguration = {
       type: this.type,
       data: {
         labels,
@@ -63,7 +68,8 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
           data,
           backgroundColor: this.type === 'pie' 
             ? CHART_COLORS.slice(0, labels.length)
-            : CHART_COLORS[0]
+            : CHART_COLORS[0],
+          ...(this.type === 'pie' ? { hoverOffset: 4 } : {})
         }]
       },
       options: {
@@ -71,28 +77,19 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         maintainAspectRatio: true,
         aspectRatio: this.isMobile()
           ? CHART_CONFIG.aspectRatio[this.type].mobile
-          : CHART_CONFIG.aspectRatio[this.type].default
-      }      
+          : CHART_CONFIG.aspectRatio[this.type].default,
+        ...(this.type === 'pie' ? {
+          onClick: (event, elements) => {
+            if (elements.length) {
+              const index = elements[0].index;
+              const item = this.chartData[index];
+              this.chartClick.emit({ index, item });
+            }
+          }
+        } : {})
+      }
     };
-
-    if (this.type === 'pie') {
-      config.data.datasets[0].hoverOffset = 4;
-      config.options.onClick = (e: any) => {
-        const points = this.chart!.getElementsAtEventForMode(
-          e,
-          'point',
-          { intersect: true },
-          true
-        );
-
-        if (points.length) {
-          const index = points[0].index;
-          const item = this.chartData[index];
-          this.chartClick.emit({ index, item });
-        }
-      };
-    }
-
+  
     this.chart = new Chart(ctx, config);
   }
 

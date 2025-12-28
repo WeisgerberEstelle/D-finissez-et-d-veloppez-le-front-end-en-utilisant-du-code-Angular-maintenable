@@ -65,7 +65,7 @@ export class HomeComponent implements OnInit {
     this.isLoading = false;
   }
 
-  private handleError(error: any): void {
+  private handleError(error: Error): void {
     this.error = error.message;
     this.isLoading = false;
   }

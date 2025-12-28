@@ -119,7 +119,7 @@ export class CountryComponent implements OnInit {
     ];
   }
 
-  private handleError(error: any): void {
+  private handleError(error: Error): void {
     this.error = error.message;
     this.isLoading = false;
   }
