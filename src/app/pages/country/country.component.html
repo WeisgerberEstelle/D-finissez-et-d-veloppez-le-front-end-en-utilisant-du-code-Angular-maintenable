@@ -14,15 +14,15 @@
     </div>
   } @else {
     <div class="chart-container wrapper-container">
-      <div class="container">
+      <figure class="container">
         <app-chart 
           type="line"
           [labels]="chartLabels"
           [data]="chartData"
           label="Medals">
         </app-chart>
-        <h2>Date</h2>
-      </div>
+        <figcaption class="center">Number of medals won at the Olympic Games per year.</figcaption>
+      </figure>
     </div>
     
     <div class="center">

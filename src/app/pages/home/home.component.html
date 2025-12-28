@@ -15,12 +15,15 @@
       </button>
     </div>
   } @else {
-    <app-chart 
-      type="pie"
-      [labels]="chartLabels"
-      [data]="chartData"
-      label="Medals"
-      (chartClick)="onCountryClick($event)">
-    </app-chart>
+    <figure>
+      <app-chart 
+        type="pie"
+        [labels]="chartLabels"
+        [data]="chartData"
+        label="Medals"
+        (chartClick)="onCountryClick($event)">
+      </app-chart>
+      <figcaption class="center">Medal distribution by country at the Olympic Games</figcaption>
+    </figure>
   }
 </div>
