@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private router: Router, private olympicService: OlympicService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadOlympicData();
   }
 
@@ -55,13 +55,7 @@ export class HomeComponent implements OnInit {
 
     this.buildStats(totalCountries, totalJOs);
 
-    this.chartData = data
-    .map((country: Olympic) => ({
-      id: country.id,
-      label: country.country,
-      value: this.olympicService.calculateTotalMedals(country.participations)
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+    this.chartData = this.buildChartData(data);
 
     this.isLoading = false;
   }
@@ -84,11 +78,21 @@ export class HomeComponent implements OnInit {
     ];
   }
 
+  private buildChartData(data: Olympic[]): ChartItem[] {
+    return data
+      .map((country) => ({
+        id: country.id,
+        label: country.country,
+        value: this.olympicService.calculateTotalMedals(country.participations),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
   public onCountryClick(event: ChartClickEvent): void {
     this.router.navigate(['country', event.item.id]);
   }
 
-  public reloadPage(): void {
+  public reloadData(): void {
     this.isLoading = true;
     this.error = null;
     this.loadOlympicData();
