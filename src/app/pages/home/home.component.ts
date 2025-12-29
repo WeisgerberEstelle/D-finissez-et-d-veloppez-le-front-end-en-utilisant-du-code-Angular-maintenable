@@ -18,7 +18,7 @@ import {
   imports: [HeaderComponent, SpinnerComponent, ChartComponent],
 })
 export class HomeComponent implements OnInit {
-  public error!: string;
+  public error: string | null = null;
   public titlePage: string = 'Medals per Country';
   public stats: Stat[] = [];
   public isLoading = true;
@@ -89,6 +89,8 @@ export class HomeComponent implements OnInit {
   }
 
   public reloadPage(): void {
-    window.location.reload();
+    this.isLoading = true;
+    this.error = null;
+    this.loadOlympicData();
   }
 }
