@@ -1,19 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Olympic, Participation } from '../models/olympic.model';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OlympicService {
-  private apiUrl = './assets/mock/olympic.json';
+  private olympics: Olympic[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private dataService: DataService) {}
 
   getOlympics(): Observable<Olympic[]> {
-    return this.http.get<Olympic[]>(this.apiUrl).pipe(
+    if (this.olympics.length > 0) {
+      return of(this.olympics);
+    }
+
+    return this.dataService.getOlympics().pipe(
+      tap(data => {
+        this.olympics = data;
+      }),
       catchError(error => {
         return throwError(() => new Error(`Unable to load olympic data: ${error.error}`));
       })
