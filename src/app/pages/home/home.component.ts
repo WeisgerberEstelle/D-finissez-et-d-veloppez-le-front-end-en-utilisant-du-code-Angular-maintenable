@@ -57,6 +57,7 @@ export class HomeComponent implements OnInit {
 
     this.chartData = data
     .map((country: Olympic) => ({
+      id: country.id,
       label: country.country,
       value: this.olympicService.calculateTotalMedals(country.participations)
     }))
@@ -84,7 +85,7 @@ export class HomeComponent implements OnInit {
   }
 
   public onCountryClick(event: ChartClickEvent): void {
-    this.router.navigate(['country', event.item.label]);
+    this.router.navigate(['country', event.item.id]);
   }
 
   public reloadPage(): void {

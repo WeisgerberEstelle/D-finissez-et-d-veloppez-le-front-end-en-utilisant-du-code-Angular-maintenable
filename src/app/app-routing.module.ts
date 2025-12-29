@@ -10,7 +10,7 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path : 'country/:countryName',
+    path : 'country/:countryId',
     component : CountryComponent
   },
 
@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    component: NotFoundComponent,
+    redirectTo: 'not-found'
   },
 ];
 
