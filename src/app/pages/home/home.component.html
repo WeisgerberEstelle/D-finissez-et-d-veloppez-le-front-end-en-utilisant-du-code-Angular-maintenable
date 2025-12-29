@@ -1,6 +1,6 @@
 <div>
   <app-header [title]="titlePage" [stats]="stats"></app-header>
-  
+
   @if (isLoading) {
     <div class="center">
       <app-spinner></app-spinner>
@@ -8,25 +8,26 @@
   } @else if (error) {
     <div class="error-block">
       <p>{{ error }}</p>
-      <button (click)="reloadPage()">
-        Reload Page
-      </button>
+      <button (click)="reloadPage()">Reload Page</button>
     </div>
   } @else if (chartData.length === 0) {
     <div class="center">
       <p>No data</p>
     </div>
   } @else {
-    <figure>
-      <app-chart 
-        type="pie"
-        [chartData]="chartData"
-        label="Medals"
-        (chartClick)="onCountryClick($event)">
-      </app-chart>
-      <figcaption class="center">
-        Medal distribution by country at the Olympic Games
-      </figcaption>
-    </figure>
+    <div class="chart-wrapper">
+      <figure class="chart-container">
+        <app-chart
+          type="pie"
+          [chartData]="chartData"
+          label="Medals"
+          (chartClick)="onCountryClick($event)"
+        >
+        </app-chart>
+        <figcaption class="center">
+          Medal distribution by country at the Olympic Games
+        </figcaption>
+      </figure>
+    </div>
   }
 </div>
