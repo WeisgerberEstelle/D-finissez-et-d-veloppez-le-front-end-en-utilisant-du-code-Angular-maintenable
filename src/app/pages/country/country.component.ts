@@ -1,6 +1,6 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { OlympicService } from 'src/app/core/services/olympic.service';
@@ -35,7 +35,8 @@ export class CountryComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private olympicService: OlympicService
+    private olympicService: OlympicService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -43,42 +44,43 @@ export class CountryComponent implements OnInit {
   }
 
   private loadCountryData(): void {
-    let countryName: string | null = null;
+    let countryId: number | null = null;
 
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((param: ParamMap) => {
-        countryName = param.get('countryName');
+        countryId = Number(param.get('countryId'));
 
-        if (countryName) {
-          this.fetchCountryDetails(countryName);
+        if (!countryId) {
+          this.router.navigateByUrl('/not-found');
+          return;
         }
+        this.fetchCountryDetails(countryId);
       });
   }
 
-  private fetchCountryDetails(countryName: string): void {
+  private fetchCountryDetails(countryId: number): void {
     this.olympicService
       .getOlympics()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data: Olympic[]) => this.handleCountryData(data, countryName),
+        next: (data: Olympic[]) => this.handleCountryData(data, countryId),
         error: (error) => this.handleError(error),
       });
   }
 
-  private handleCountryData(data: Olympic[], countryName: string): void {
+  private handleCountryData(data: Olympic[], countryId: number): void {
     if (!data || data.length === 0) {
       this.isLoading = false;
       return;
     }
 
     const selectedCountry = data.find(
-      (country: Olympic) => country.country === countryName
+      (country: Olympic) => country.id === countryId
     );
 
     if (!selectedCountry) {
-      this.error = 'Country not found';
-      this.isLoading = false;
+      this.router.navigateByUrl('/not-found');
       return;
     }
 
@@ -89,6 +91,7 @@ export class CountryComponent implements OnInit {
     const totalAthletes: number = this.olympicService.calculateTotalAthletes(participations);
     this.buildStats(totalEntries, totalMedals, totalAthletes);
     this.chartData = participations.map((p: Participation) => ({
+      id: p.id,
       label: p.year,
       value: p.medalsCount
     }));

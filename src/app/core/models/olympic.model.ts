@@ -18,6 +18,7 @@ export interface Stat {
 }
 
 export interface ChartItem {
+    id: number;
     label: number|string;
     value: number;
 }
