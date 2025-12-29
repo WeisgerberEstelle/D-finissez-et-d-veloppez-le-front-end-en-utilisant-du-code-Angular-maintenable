@@ -1,12 +1,11 @@
 # Notes - architecture
-
 ## **Exercice 1**
 
 ### **PROBLÈMES CRITIQUES**
 
 ### **1. Appels HTTP dans les composants / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.27), `home.component.ts` (l.22)
 - **Description :** `this.http.get()` directement dans les composants au lieu d'un service dédié
 - **Impact :** Violation SRP, code non testable, duplication logique HTTP
 - **Solution :** Créer `olympic.service.ts` et déplacer tous les appels HTTP
@@ -20,14 +19,14 @@
 
 ### **3. Memory leaks (subscriptions non gérées)**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.27), `home.component.ts` (l.22)
 - **Description :** `subscribe()` sans `unsubscribe()` ou `takeUntil`
 - **Impact :** Mémoire qui explose progressivement, app ralentit, risque de crash
 - **Solution :** Utiliser `takeUntilDestroyed()` ou `async pipe`
 
 ### **4. Logique métier dans les composants / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.30-l.39), `home.component.ts` (l.25-l.31)
 - **Description :** Calculs complexes (`reduce`, `map`, `flat`) directement dans les composants
 - **Impact :** Code non réutilisable, violation SRP, tests impossibles
 - **Solution :** Déplacer tous les calculs dans `olympic.service.ts`
@@ -43,185 +42,185 @@
 
 ### **6. Manipulation directe du DOM**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts`(l.48), `home.component.ts` (l.41)
 - **Description :** `new Chart("countryChart", {...})` avec accès par ID
 - **Impact :** Timing non garanti avec ngOnInit, tests impossibles
 - **Solution :** Utiliser **ngAfterViewInit** avec`@ViewChild` avec `ElementRef`
 
-### **7. `console.log` en production (syntaxe incorrecte)**
+### **7. Code Chart.js dupliqué**
 
-- **Fichiers :** `home.component.ts`
-- **Description :** `console.log`erreur : ${error}``  (syntaxe incorrecte)
-- **Impact :** Bug d'affichage, fuite données sensibles, pollution console
-- **Solution :** Supprimer ou utiliser `logger.service.ts`
-
-### **8. Code Chart.js dupliqué**
-
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts`(l.48), `home.component.ts` (l.41)
 - **Description :** Configuration Chart.js répétée dans les 2 composants
 - **Impact :** Maintenance difficile, incohérence possible, code verbeux
 - **Solution :** Créer composant `ChartComponent` réutilisable dans `shared/`
 
-### **9. Gestion d'erreur insuffisante**
+### **8. Gestion d'erreur insuffisante**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.43), `home.component.ts` (l.35)
 - **Description :** Erreur stockée (`this.error = error.message`) mais jamais affichée
 - **Impact :** Mauvaise UX, utilisateur bloqué sans feedback
 - **Solution :** Afficher message d'erreur dans le template + redirection
 
-### **10. Conversions inutiles (number→string→number)**
+### **9. Conversions inutiles (number→string→number)**
 
-- **Fichiers :** `country.component.ts`
+- **Fichiers :** `country.component.ts` (l.30 -l.39)
 - **Description :** `.map(i => i.medalsCount.toString())` puis `parseInt(item)`
 - **Impact :** Performance dégradée, code confus, risque de NaN
 - **Solution :** Garder le type `number` directement sans conversion
 
-### **11. Double subscription imbriquée**
+### **10. Double subscription avec race condition**
 
 - **Fichiers :** `country.component.ts`
-- **Description :** `route.paramMap.subscribe()` puis `http.get().subscribe()`
-- **Impact :** Code verbeux, difficile à maintenir, gestion erreur complexe
+- **Description :** `route.paramMap.subscribe()` puis `http.get().subscribe()` mais la deuxième utilise une variable dont la valeur est attribuée dans la première
+- **Impact :** Bug potentiel (tentative d'accès à un pays avec `countryName = null`)
 - **Solution :** Utiliser `switchMap` pour combiner les observables
 
-### **12. Pas de vérification null/undefined**
+### **11. Pas de vérification null/undefined**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
-- **Description :** `this.titlePage = selectedCountry.country` sans vérifier si existe
+- **Fichiers :** `country.component.ts` (l.31), `home.component.ts`
+- **Description :** `this.titlePage = selectedCountry.country` sans vérifier si `selectedCountry` existe
 - **Impact :** Crash si données manquantes, pas de fallback
 - **Solution :** Vérifier avec `if (!selectedCountry)` et rediriger vers `/not-found`
 
-### **13. Couleurs et configs en dur / ANTI-PATTERN**
+### **12. Couleurs et configs en dur / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.39), `home.component.ts` (l.49)
 - **Description :** `backgroundColor: ['#0b868f', '#adc3de', ...]` directement dans le code
 - **Impact :** Pas de centralisation, impossible à thématiser, limite à 6 couleurs
 - **Solution :** Créer `chart.constants.ts` avec palette dynamique
 
-## **PROBLÈMES MINEURS +**
+## **PROBLÈMES MINEURS**
 
-### **14. Classes CSS trop génériques**
+### **13. Classes CSS trop génériques**
 
 - **Fichiers :** Tous `.scss`
 - **Description :** `.container`, `.center`, `.split` (noms trop génériques)
 - **Impact :** Risque de conflit CSS avec librairies tierces
 - **Solution :** Utiliser BEM : `.country-chart__container`
 
-### **15. Structure HTML non sémantique**
+### **14. Structure HTML non sémantique**
 
 - **Fichiers :** Tous `.html`
 - **Description :** Divs imbriquées sans balises HTML5 (`<header>`, `<main>`, `<section>`) + abscence de `<h1>`
 - **Impact :** SEO dégradé, accessibilité faible pour lecteurs d'écran
 - **Solution :** Remplacer divs par balises sémantiques appropriées
 
-### **16. Accessibilité insuffisante**
+### **15. Accessibilité insuffisante**
 
 - **Fichiers :** Tous `.html`
 - **Description :** Pas d'attributs ARIA, pas de `role`, pas de labels descriptifs
 - **Impact :** Inaccessible aux utilisateurs avec handicap
 - **Solution :** Ajouter `aria-label`, `role="img"`, etc.
 
-### **17. Canvas avec interpolation incorrecte**
+### **16. Canvas avec interpolation incorrecte**
 
 - **Fichiers :** `country.component.html`, `home.component.html`
 - **Description :** `<canvas>{{ lineChart }}</canvas>` (syntaxe incorrecte pour canvas)
 - **Impact :** Affichage inattendu, pas l'usage prévu d'un canvas
 - **Solution :** Utiliser `<canvas #chartCanvas></canvas>`
 
-### **18. Titre H2 au lieu de H1**
+### **17. Titre H2 au lieu de H1**
 
 - **Fichiers :** `home.component.html`
 - **Description :** `<h2>Olympic games app</h2>` comme titre principal de page
 - **Impact :** Mauvais pour SEO et hiérarchie des titres
 - **Solution :** Utiliser `<h1>` pour le titre principal
 
-### **19. Balise `<hr/>` orpheline**
+### **18. Balise `<hr/>` orpheline**
 
 - **Fichiers :** `home.component.html`
 - **Description :** `<hr/>` utilisée pour décoration visuelle
 - **Impact :** Mauvaise sémantique, devrait être géré en CSS
 - **Solution :** Supprimer et utiliser CSS pour la séparation visuelle
 
-### **20. Texte peu clair**
+### **19. Texte peu clair**
 
 - **Fichiers :** `home.component.html`
 - **Description :** Abréviation "JOs" non explicite pour utilisateurs internationaux
 - **Impact :** Confusion possible, mauvaise UX
 - **Solution :** Écrire "Olympic Games" ou utiliser `<abbr>`
 
-### **21. Variables déclarées mais inutilisées**
+### **20. Variables déclarées mais inutilisées**
 
 - **Fichiers :** `country.component.ts`, `home.component.ts`
 - **Description :** `public error!: string;` déclaré mais jamais affiché
 - **Impact :** Code mort, confusion pour les développeurs
-- **Solution :** Supprimer ou rendre `private` si usage interne uniquement
+- **Solution :** Supprimer, afficher ou rendre `private` si usage interne uniquement
 
-### **22. Pipe vide sans opérateurs**
+### **21. Pipe vide sans opérateurs**
 
-- **Fichiers :** `country.component.ts`
+- **Fichiers :** `country.component.ts` (l.22)
 - **Description :** `.pipe().subscribe()` sans opérateurs RxJS
 - **Impact :** Code inutile, confusion
 - **Solution :** Supprimer `.pipe()`
 
-### **23. Inconsistances de formatage**
+### **22. Inconsistances de formatage**
 
-- **Fichiers :** Plusieurs fichiers
+- **Fichiers :** Plusieurs fichiers (ex : `home.component.ts`)
 - **Description :** Espaces avant `:`, quotes mixtes (simple/double), indentation variable
 - **Impact :** Lisibilité réduite, code non professionnel
 - **Solution :** Utiliser Prettier ou ESLint avec config stricte
 
-### **24. Noms de variables non descriptifs**
+### **23. Noms de variables non descriptifs**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
+- **Fichiers :** `country.component.ts` (l.30), `home.component.ts`(l.29)
 - **Description :** Variable `i` réutilisée 3 fois avec significations différentes
 - **Impact :** Code difficile à comprendre
 - **Solution :** Utiliser noms descriptifs : `country`, `participation`, `medalCount`
 
-### **Exercice 2**
+---
 
+## **Exercice 2**
+
+### **1. ARBORESCENCE PROPOSÉE**
+
+```
 src/
 └── app/
-├── core/                                    
-│   ├── services/
-│   │   ├── olympic.service.ts               # Service principal (data access + business logic)
-│   ├── models/
-│   │   └── olympic.model.ts                 # TypeScript Interfaces (Olympic, Participation)
-│   └── constants/
-│       └── chart.constants.ts               #Constants (colors, configs Chart.js)
-│
-├── shared/                                  # Composants réutilisables
-│   ├── components/
-│   │   ├── chart/
-│   │   │   ├── chart.component.ts 
-│   │   │   ├── chart.component.html 
-│   │   │   └── chart.component.scss 
-│   │   ├── page-header/
-│   │   │   ├── page-header.component.ts 
-│   │   │   ├── page-header.component.html
-│   │   │   └── page-header.component.scss
-│   │   └── stat-card/
-│   │       ├── stat-card.component.ts
-│   │       ├── stat-card.component.html
-│   │       └── stat-card.component.scss
-│   └── shared.module.ts
-├── pages/ 
-│   ├── home/
-│   │   ├── home.component.ts
-│   │   ├── home.component.html
-│   │   └── home.component.scss 
-│   ├── country/
-│   │   ├── country.component.ts
-│   │   ├── country.component.html 
-│   │   └── country.component.scss
-│   └── not-found/
-│       ├── not-found.component.ts
-│       ├── not-found.component.html 
-│       └── not-found.component.scss
-│
-├── app.component.ts
-├── app.component.html 
-├── app.component.scss
-├── app.module.ts 
-└── app-routing.module.ts
+    ├── core/
+    │   ├── services/
+    │   │   ├── olympic.service.ts               # Service principal (data access + business logic)
+    │   ├── models/
+    │   │   └── olympic.model.ts                 # TypeScript Interfaces (Olympic, Participation)
+    │   └── constants/
+    │       └── chart.constants.ts               # Constants (colors, configs Chart.js)
+    │
+    ├── shared/                                  # Composants réutilisables
+    │   ├── components/
+    │   │   ├── chart/
+    │   │   │   ├── chart.component.ts
+    │   │   │   ├── chart.component.html
+    │   │   │   └── chart.component.scss
+    │   │   ├── page-header/
+    │   │   │   ├── page-header.component.ts
+    │   │   │   ├── page-header.component.html
+    │   │   │   └── page-header.component.scss
+    │   │   └── stat-card/
+    │   │       ├── stat-card.component.ts
+    │   │       ├── stat-card.component.html
+    │   │       └── stat-card.component.scss
+    │   └── shared.module.ts
+    ├── pages/
+    │   ├── home/
+    │   │   ├── home.component.ts
+    │   │   ├── home.component.html
+    │   │   └── home.component.scss
+    │   ├── country/
+    │   │   ├── country.component.ts
+    │   │   ├── country.component.html
+    │   │   └── country.component.scss
+    │   └── not-found/
+    │       ├── not-found.component.ts
+    │       ├── not-found.component.html
+    │       └── not-found.component.scss
+    │
+    ├── app.component.ts
+    ├── app.component.html
+    ├── app.component.scss
+    ├── app.module.ts
+    └── app-routing.module.ts
+
+```
 
 ### **2. DESCRIPTION DES DOSSIERS**
 
@@ -243,9 +242,9 @@ src/
 
 ### **Observer Pattern (RxJS Observables)**
 
-RxJS **utilise** l’Observer Pattern
+RxJS **utilise** l'Observer Pattern
 
-**Problème résolu :** Gestion asynchrone des données HTTP, /!\ gestion de l’unsubscribe
+**Problème résolu :** Gestion asynchrone des données HTTP, /!\ gestion de l'unsubscribe
 
 ### **Facade Pattern**
 
@@ -277,4 +276,5 @@ RxJS **utilise** l’Observer Pattern
 │  DATA SOURCE (JSON / API)           │
 │  olympic.json                       │
 └─────────────────────────────────────┘
+
 ```
