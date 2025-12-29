@@ -15,12 +15,12 @@ export const CHART_CONFIG = {
   maintainAspectRatio: true,
   aspectRatio: {
     pie: {
-      default: 2.5,
+      default: 1,
       mobile: 1
     },
     line: {
       default: 2.5,
-      mobile: 1.5
+      mobile: 2.5
     }
   }
 } as const;
