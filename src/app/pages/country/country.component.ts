@@ -1,14 +1,12 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import Chart from 'chart.js/auto';
 import { CommonModule } from '@angular/common';
 
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { ChartItem, Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
-import { CHART_COLORS } from '../../core/constants/chart.constants';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
 import { ChartComponent } from 'src/app/shared/components/chart/chart.component';
 
