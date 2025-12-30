@@ -12,12 +12,12 @@
   } @else if (error) {
     <div class="error-block">
       <p>{{ error }}</p>
-      <button routerLink="">Back to Home</button>
+      <a routerLink="" class="btn-back">Back to Home</a>
     </div>
   } @else if (chartData.length === 0) {
     <div class="flex-center-column-m">
       <p>No data available</p>
-      <button routerLink="">Back to Home</button>
+      <a routerLink="" class="btn-back">Back to Home</a>
     </div>
   } @else {
     <div class="chart-wrapper">
@@ -32,7 +32,7 @@
     </div>
     
     <div class="flex-center-m">
-      <button routerLink="">Back to Home</button>
+      <a routerLink="" class="btn-back">Back to Home</a>
     </div>
   }
 </div>
