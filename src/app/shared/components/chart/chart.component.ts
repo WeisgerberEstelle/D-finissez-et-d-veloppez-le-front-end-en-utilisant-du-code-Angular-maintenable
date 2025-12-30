@@ -37,6 +37,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   @Output() chartClick = new EventEmitter<ChartClickEvent>();
 
   private chart?: Chart;
+  public chartDescription: string = '';
 
   ngAfterViewInit(): void {
     if (this.chartData.length > 0) {
@@ -89,11 +90,24 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         } : {})
       }
     };
-  
+    this.chartDescription = this.getChartDescription();
     this.chart = new Chart(ctx, config);
   }
 
   private isMobile(): boolean {
     return window.innerWidth <= 1000;
+  }
+
+  public getChartDescription(): string {
+    if (!this.chartData || this.chartData.length === 0) {
+      return 'No data available.';
+    }
+
+    const total = this.chartData.reduce((sum, item) => sum + item.value, 0);
+    const descriptions = this.chartData
+      .map(item => `${item.label}: ${item.value}`)
+      .join(', ');
+
+    return `${this.label} chart showing total of ${total} across ${this.chartData.length} countries. ${descriptions}.`;
   }
 }
