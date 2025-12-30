@@ -1,21 +1,21 @@
-<div>
+<main class="country-container">
   @if (titlePage) {
     <div>
-      <app-header [title]="titlePage" [stats]="stats"/>
+      <app-header [title]="titlePage" [stats]="stats" />
     </div>
   }
 
   @if (isLoading) {
-    <div class="flex-center-m">
-      <app-spinner></app-spinner>
+    <div class="flex-center-m" role="status" aria-live="polite">
+      <app-spinner />
     </div>
   } @else if (error) {
-    <div class="error-block">
+    <div class="error-block" role="alert" aria-live="assertive">
       <p>{{ error }}</p>
-      <a routerLink="" class="btn-back">Back to Home</a>
+      <a routerLink="" class="btn-back" aria-label="Return to home page">Back to Home</a>
     </div>
   } @else if (chartData.length === 0) {
-    <div class="flex-center-column-m">
+    <div class="flex-center-column-m" aria-label="Return to home page">
       <p>No data available</p>
       <a routerLink="" class="btn-back">Back to Home</a>
     </div>
@@ -25,14 +25,15 @@
         <app-chart 
           type="line"
           [chartData]="chartData"
-          label="Number of medals">
+          label="Number of medals"
+          aria-describedby="chart-desc">
         </app-chart>
-        <figcaption class="flex-center-m">Number of medals won at the Olympic Games per year.</figcaption>
+        <figcaption id="chart-desc" class="flex-center-m">Number of medals won at the Olympic Games per year.</figcaption>
       </figure>
     </div>
     
     <div class="flex-center-m">
-      <a routerLink="" class="btn-back">Back to Home</a>
+      <a routerLink="" class="btn-back" aria-label="Return to home page">Back to Home</a>
     </div>
   }
-</div>
+</main>
