@@ -2,7 +2,7 @@
   <app-header [title]="titlePage" [stats]="stats"></app-header>
 
   @if (isLoading) {
-    <div class="center">
+    <div class="flex-center-m">
       <app-spinner></app-spinner>
     </div>
   } @else if (error) {
@@ -11,7 +11,7 @@
       <button (click)="reloadData()">Reload Page</button>
     </div>
   } @else if (chartData.length === 0) {
-    <div class="center">
+    <div class="flex-center-m">
       <p>No data</p>
     </div>
   } @else {

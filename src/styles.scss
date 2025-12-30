@@ -1,14 +1,12 @@
-.center {
+:root {
+    --primary-color: #0b868f;
+    --color-gray: gray;
+}
+
+.flex-center-m {
     display: flex;
     justify-content: center;
-    margin: 5px;
-
-    h2 {
-        background: #0b868f;
-        padding: 10px;
-        border-radius: 10px;
-        color: white;
-    }
+    margin: 0.3125rem;
 }
 
 .error-block {
