@@ -12,7 +12,6 @@ import {
   Chart,
   ChartConfiguration,
 } from 'chart.js/auto';
-
 import { CHART_COLORS, CHART_CONFIG } from '../../../core/constants/chart.constants';
 import { ChartItem } from 'src/app/core/models/olympic.model';
 
@@ -56,42 +55,81 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     if (!ctx) return;
   
     this.chart?.destroy();
-  
-    const labels = this.chartData.map(d => d.label);
-    const data = this.chartData.map(d => d.value);
-  
-    const config: ChartConfiguration = {
-      type: this.type,
+    
+    const config = this.type === 'pie' 
+      ? this.createPieChartConfig() 
+      : this.createLineChartConfig();
+
+    this.chartDescription = this.getChartDescription();
+    this.chart = new Chart(ctx, config);
+  }
+
+  private getCommonChartData() {
+    return {
+      labels: this.chartData.map(d => d.label),
+      data: this.chartData.map(d => d.value)
+    };
+  }
+
+  private getCommonOptions() {
+    return {
+      responsive: CHART_CONFIG.responsive,
+      maintainAspectRatio: true,
+      aspectRatio: this.getAspectRatio()
+    };
+  }
+
+  private getAspectRatio(): number {
+    const isMobile = this.isMobile();
+    return isMobile
+      ? CHART_CONFIG.aspectRatio[this.type].mobile
+      : CHART_CONFIG.aspectRatio[this.type].default;
+  }
+
+  private createPieChartConfig(): ChartConfiguration {
+    const { labels, data } = this.getCommonChartData();
+
+    return {
+      type: 'pie',
       data: {
         labels,
         datasets: [{
           label: this.label,
           data,
-          backgroundColor: this.type === 'pie' 
-            ? CHART_COLORS.slice(0, labels.length)
-            : CHART_COLORS[0],
-          ...(this.type === 'pie' ? { hoverOffset: 4 } : {})
+          backgroundColor: CHART_COLORS.slice(0, labels.length),
+          hoverOffset: 4
         }]
       },
       options: {
-        responsive: CHART_CONFIG.responsive,
-        maintainAspectRatio: true,
-        aspectRatio: this.isMobile()
-          ? CHART_CONFIG.aspectRatio[this.type].mobile
-          : CHART_CONFIG.aspectRatio[this.type].default,
-        ...(this.type === 'pie' ? {
-          onClick: (event, elements) => {
-            if (elements.length) {
-              const index = elements[0].index;
-              const item = this.chartData[index];
-              this.chartClick.emit({ index, item });
-            }
+        ...this.getCommonOptions(),
+        onClick: (event, elements) => {
+          if (elements.length) {
+            const index = elements[0].index;
+            const item = this.chartData[index];
+            this.chartClick.emit({ index, item });
           }
-        } : {})
+        }
       }
     };
-    this.chartDescription = this.getChartDescription();
-    this.chart = new Chart(ctx, config);
+  }
+
+  private createLineChartConfig(): ChartConfiguration {
+    const { labels, data } = this.getCommonChartData();
+
+    return {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: this.label,
+          data,
+          backgroundColor: CHART_COLORS[0]
+        }]
+      },
+      options: {
+        ...this.getCommonOptions()
+      }
+    };
   }
 
   private isMobile(): boolean {
