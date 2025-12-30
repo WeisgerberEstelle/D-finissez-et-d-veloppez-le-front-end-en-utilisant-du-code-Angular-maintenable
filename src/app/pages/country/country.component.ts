@@ -65,7 +65,7 @@ export class CountryComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: Olympic[]) => this.handleCountryData(data, countryId),
-        error: (error) => this.handleError(error),
+        error: () => this.handleError(),
       });
   }
 
@@ -120,8 +120,8 @@ export class CountryComponent implements OnInit {
     ];
   }
 
-  private handleError(error: Error): void {
-    this.error = error.message;
+  private handleError(): void {
+    this.error = 'Unable to retrieve country statistics';
     this.isLoading = false;
   }
 }

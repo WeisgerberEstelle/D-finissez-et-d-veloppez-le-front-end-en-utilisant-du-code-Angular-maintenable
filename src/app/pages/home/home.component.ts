@@ -38,7 +38,7 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: Olympic[]) => this.handleOlympicData(data),
-        error: (error: Error) => this.handleError(error),
+        error: () => this.handleError(),
       });
   }
 
@@ -58,8 +58,8 @@ export class HomeComponent implements OnInit {
     this.isLoading = false;
   }
 
-  private handleError(error: Error): void {
-    this.error = error.message;
+  private handleError(): void {
+    this.error = 'Unable to retrieve medal distribution by country';
     this.isLoading = false;
   }
 
