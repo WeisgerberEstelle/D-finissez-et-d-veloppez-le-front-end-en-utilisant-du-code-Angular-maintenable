@@ -21,14 +21,12 @@ export class HomeComponent implements OnInit {
   public error: string | null = null;
   public titlePage: string = 'Medals per Country';
   public stats: Stat[] = [];
-  public isLoading = true;
-
-  public chartLabels: string[] = [];
+  public isLoading: boolean = true;
   public chartData: ChartItem[] = [];
 
-  private destroyRef = inject(DestroyRef);
-
-  constructor(private router: Router, private olympicService: OlympicService) {}
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly olympicService = inject(OlympicService);
 
   ngOnInit(): void {
     this.loadOlympicData();
@@ -40,12 +38,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: Olympic[]) => this.handleOlympicData(data),
-        error: (error) => this.handleError(error),
+        error: (error: Error) => this.handleError(error),
       });
   }
 
   private handleOlympicData(data: Olympic[]): void {
-    if (!data || data.length === 0) {
+    if (!data?.length) {
       this.isLoading = false;
       return;
     }
