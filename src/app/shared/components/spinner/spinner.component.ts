@@ -7,8 +7,8 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./spinner.component.scss'],
 })
 export class SpinnerComponent {
-  @Input() size = 40;
+  @Input() size = 100;
   @Input() stroke = 10;
-  @Input() color = 'red';
+  @Input() color = '#0b868f';
   @Input() center = true;
 }
