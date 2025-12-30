@@ -20,6 +20,6 @@
 h2 {
     background: var(--primary-color);
     padding: 10px;
-    border-radius: 10px;
+    border-radius: var(--box-radius);
     color: white;
 }

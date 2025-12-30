@@ -1,7 +1,7 @@
 dl {
     padding: 0.625rem;
     border: 1px solid var(--primary-color);
-    border-radius: 0.625rem;
+    border-radius: var(--box-radius);
     margin: 0;
 
     dd,dt {
