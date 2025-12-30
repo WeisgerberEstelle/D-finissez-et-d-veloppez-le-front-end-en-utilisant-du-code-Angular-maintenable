@@ -1,10 +1,12 @@
 <div>
-  <div>
-    <app-header [title]="titlePage" [stats]="stats"/>
-  </div>
-  
+  @if (titlePage) {
+    <div>
+      <app-header [title]="titlePage" [stats]="stats"/>
+    </div>
+  }
+
   @if (isLoading) {
-    <div class="center">
+    <div class="flex-center-m">
       <app-spinner></app-spinner>
     </div>
   } @else if (error) {
@@ -13,8 +15,9 @@
       <button routerLink="">Back to Home</button>
     </div>
   } @else if (chartData.length === 0) {
-    <div class="center">
-      <p>No data</p>
+    <div class="flex-center-column-m">
+      <p>No data available</p>
+      <button routerLink="">Back to Home</button>
     </div>
   } @else {
     <div class="chart-wrapper">
@@ -22,13 +25,13 @@
         <app-chart 
           type="line"
           [chartData]="chartData"
-          label="Medals">
+          label="Number of medals">
         </app-chart>
-        <figcaption class="center">Number of medals won at the Olympic Games per year.</figcaption>
+        <figcaption class="flex-center-m">Number of medals won at the Olympic Games per year.</figcaption>
       </figure>
     </div>
     
-    <div class="center">
+    <div class="flex-center-m">
       <button routerLink="">Back to Home</button>
     </div>
   }
