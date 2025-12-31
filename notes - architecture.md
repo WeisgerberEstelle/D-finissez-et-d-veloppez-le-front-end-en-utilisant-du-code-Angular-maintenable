@@ -1,191 +1,191 @@
-# Notes - architecture
-## **Exercice 1**
+# Notes - Architecture
+## **Exercise 1**
 
-### **PROBLÈMES CRITIQUES**
+### **CRITICAL ISSUES**
 
-### **1. Appels HTTP dans les composants / ANTI-PATTERN**
+### **1. HTTP calls in components / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts` (l.27), `home.component.ts` (l.22)
-- **Description :** `this.http.get()` directement dans les composants au lieu d'un service dédié
-- **Impact :** Violation SRP, code non testable, duplication logique HTTP
-- **Solution :** Créer `olympic.service.ts` et déplacer tous les appels HTTP
+- **Files:** `country.component.ts` (l.27), `home.component.ts` (l.22)
+- **Description:** `this.http.get()` directly in components instead of dedicated service
+- **Impact:** SRP violation, untestable code, HTTP logic duplication
+- **Solution:** Create `olympic.service.ts` and move all HTTP calls
 
-### **2. Absence de typage strict (abus de `any`)**
+### **2. Lack of strict typing (abuse of `any`)**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
-- **Description :** Variables typées `any`, paramètres `(i: any)`, pas d'interfaces
-- **Impact :** Perte sécurité TypeScript, bugs runtime non détectés, pas d'autocomplétion
-- **Solution :** Créer interfaces `Olympic` et `Participation` dans `models/`
+- **Files:** `country.component.ts`, `home.component.ts`
+- **Description:** Variables typed as `any`, parameters `(i: any)`, no interfaces
+- **Impact:** Loss of TypeScript safety, undetected runtime bugs, no autocomplete
+- **Solution:** Create `Olympic` and `Participation` interfaces in `models/`
 
-### **3. Memory leaks (subscriptions non gérées)**
+### **3. Memory leaks (unmanaged subscriptions)**
 
-- **Fichiers :** `country.component.ts` (l.27), `home.component.ts` (l.22)
-- **Description :** `subscribe()` sans `unsubscribe()` ou `takeUntil`
-- **Impact :** Mémoire qui explose progressivement, app ralentit, risque de crash
-- **Solution :** Utiliser `takeUntilDestroyed()` ou `async pipe`
+- **Files:** `country.component.ts` (l.27), `home.component.ts` (l.22)
+- **Description:** `subscribe()` without `unsubscribe()` or `takeUntil`
+- **Impact:** Memory explodes progressively, app slows down, crash risk
+- **Solution:** Use `takeUntilDestroyed()` or `async pipe`
 
-### **4. Logique métier dans les composants / ANTI-PATTERN**
+### **4. Business logic in components / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts` (l.30-l.39), `home.component.ts` (l.25-l.31)
-- **Description :** Calculs complexes (`reduce`, `map`, `flat`) directement dans les composants
-- **Impact :** Code non réutilisable, violation SRP, tests impossibles
-- **Solution :** Déplacer tous les calculs dans `olympic.service.ts`
+- **Files:** `country.component.ts` (l.30-l.39), `home.component.ts` (l.25-l.31)
+- **Description:** Complex calculations (`reduce`, `map`, `flat`) directly in components
+- **Impact:** Non-reusable code, SRP violation, impossible to test
+- **Solution:** Move all calculations to `olympic.service.ts`
 
-### **5. Architecture incomplète / ANTI-PATTERN**
+### **5. Incomplete architecture / ANTI-PATTERN**
 
-- **Fichiers :** Toute l'application
-- **Description :** Absence de dossiers `services/`, `models/`, `constants/`, `guards/`
-- **Impact :** Structure non professionnelle, non maintenable, non scalable
-- **Solution :** Créer l'arborescence `core/` avec services, models, constants
+- **Files:** Entire application
+- **Description:** Missing `services/`, `models/`, `constants/`, `guards/` folders
+- **Impact:** Unprofessional structure, not maintainable, not scalable
+- **Solution:** Create `core/` folder structure with services, models, constants
 
-## **PROBLÈMES MOYENS**
+## **MEDIUM ISSUES**
 
-### **6. Manipulation directe du DOM**
+### **6. Direct DOM manipulation**
 
-- **Fichiers :** `country.component.ts`(l.48), `home.component.ts` (l.41)
-- **Description :** `new Chart("countryChart", {...})` avec accès par ID
-- **Impact :** Timing non garanti avec ngOnInit, tests impossibles
-- **Solution :** Utiliser **ngAfterViewInit** avec`@ViewChild` avec `ElementRef`
+- **Files:** `country.component.ts`(l.48), `home.component.ts` (l.41)
+- **Description:** `new Chart("countryChart", {...})` with ID access
+- **Impact:** Timing not guaranteed with ngOnInit, impossible to test
+- **Solution:** Use **ngAfterViewInit** with `@ViewChild` and `ElementRef`
 
-### **7. Code Chart.js dupliqué**
+### **7. Duplicated Chart.js code**
 
-- **Fichiers :** `country.component.ts`(l.48), `home.component.ts` (l.41)
-- **Description :** Configuration Chart.js répétée dans les 2 composants
-- **Impact :** Maintenance difficile, incohérence possible, code verbeux
-- **Solution :** Créer composant `ChartComponent` réutilisable dans `shared/`
+- **Files:** `country.component.ts`(l.48), `home.component.ts` (l.41)
+- **Description:** Chart.js configuration repeated in both components
+- **Impact:** Difficult maintenance, possible inconsistency, verbose code
+- **Solution:** Create reusable `ChartComponent` in `shared/`
 
-### **8. Gestion d'erreur insuffisante**
+### **8. Insufficient error handling**
 
-- **Fichiers :** `country.component.ts` (l.43), `home.component.ts` (l.35)
-- **Description :** Erreur stockée (`this.error = error.message`) mais jamais affichée
-- **Impact :** Mauvaise UX, utilisateur bloqué sans feedback
-- **Solution :** Afficher message d'erreur dans le template + redirection
+- **Files:** `country.component.ts` (l.43), `home.component.ts` (l.35)
+- **Description:** Error stored (`this.error = error.message`) but never displayed
+- **Impact:** Poor UX, user blocked without feedback
+- **Solution:** Display error message in template + redirection
 
-### **9. Conversions inutiles (number→string→number)**
+### **9. Unnecessary conversions (number→string→number)**
 
-- **Fichiers :** `country.component.ts` (l.30 -l.39)
-- **Description :** `.map(i => i.medalsCount.toString())` puis `parseInt(item)`
-- **Impact :** Performance dégradée, code confus, risque de NaN
-- **Solution :** Garder le type `number` directement sans conversion
+- **Files:** `country.component.ts` (l.30 -l.39)
+- **Description:** `.map(i => i.medalsCount.toString())` then `parseInt(item)`
+- **Impact:** Degraded performance, confusing code, NaN risk
+- **Solution:** Keep `number` type directly without conversion
 
-### **10. Double subscription avec race condition**
+### **10. Double subscription with race condition**
 
-- **Fichiers :** `country.component.ts`
-- **Description :** `route.paramMap.subscribe()` puis `http.get().subscribe()` mais la deuxième utilise une variable dont la valeur est attribuée dans la première
-- **Impact :** Bug potentiel (tentative d'accès à un pays avec `countryName = null`)
-- **Solution :** Utiliser `switchMap` pour combiner les observables
+- **Files:** `country.component.ts`
+- **Description:** `route.paramMap.subscribe()` then `http.get().subscribe()` but second uses variable assigned in first
+- **Impact:** Potential bug (attempt to access country with `countryName = null`)
+- **Solution:** Use `switchMap` to combine observables
 
-### **11. Pas de vérification null/undefined**
+### **11. No null/undefined checks**
 
-- **Fichiers :** `country.component.ts` (l.31), `home.component.ts`
-- **Description :** `this.titlePage = selectedCountry.country` sans vérifier si `selectedCountry` existe
-- **Impact :** Crash si données manquantes, pas de fallback
-- **Solution :** Vérifier avec `if (!selectedCountry)` et rediriger vers `/not-found`
+- **Files:** `country.component.ts` (l.31), `home.component.ts`
+- **Description:** `this.titlePage = selectedCountry.country` without checking if `selectedCountry` exists
+- **Impact:** Crash if data missing, no fallback
+- **Solution:** Check with `if (!selectedCountry)` and redirect to `/not-found`
 
-### **12. Couleurs et configs en dur / ANTI-PATTERN**
+### **12. Hardcoded colors and configs / ANTI-PATTERN**
 
-- **Fichiers :** `country.component.ts` (l.39), `home.component.ts` (l.49)
-- **Description :** `backgroundColor: ['#0b868f', '#adc3de', ...]` directement dans le code
-- **Impact :** Pas de centralisation, impossible à thématiser, limite à 6 couleurs
-- **Solution :** Créer `chart.constants.ts` avec palette dynamique
+- **Files:** `country.component.ts` (l.39), `home.component.ts` (l.49)
+- **Description:** `backgroundColor: ['#0b868f', '#adc3de', ...]` directly in code
+- **Impact:** No centralization, impossible to theme, limited to 6 colors
+- **Solution:** Create `chart.constants.ts` with dynamic palette
 
-## **PROBLÈMES MINEURS**
+## **MINOR ISSUES**
 
-### **13. Classes CSS trop génériques**
+### **13. Too generic CSS classes**
 
-- **Fichiers :** Tous `.scss`
-- **Description :** `.container`, `.center`, `.split` (noms trop génériques)
-- **Impact :** Risque de conflit CSS avec librairies tierces
-- **Solution :** Utiliser BEM : `.country-chart__container`
+- **Files:** All `.scss`
+- **Description:** `.container`, `.center`, `.split` (too generic names)
+- **Impact:** CSS conflict risk with third-party libraries
+- **Solution:** Use BEM: `.country-chart__container`
 
-### **14. Structure HTML non sémantique**
+### **14. Non-semantic HTML structure**
 
-- **Fichiers :** Tous `.html`
-- **Description :** Divs imbriquées sans balises HTML5 (`<header>`, `<main>`, `<section>`) + abscence de `<h1>`
-- **Impact :** SEO dégradé, accessibilité faible pour lecteurs d'écran
-- **Solution :** Remplacer divs par balises sémantiques appropriées
+- **Files:** All `.html`
+- **Description:** Nested divs without HTML5 tags (`<header>`, `<main>`, `<section>`) + missing `<h1>`
+- **Impact:** Degraded SEO, poor accessibility for screen readers
+- **Solution:** Replace divs with appropriate semantic tags
 
-### **15. Accessibilité insuffisante**
+### **15. Insufficient accessibility**
 
-- **Fichiers :** Tous `.html`
-- **Description :** Pas d'attributs ARIA, pas de `role`, pas de labels descriptifs
-- **Impact :** Inaccessible aux utilisateurs avec handicap
-- **Solution :** Ajouter `aria-label`, `role="img"`, etc.
+- **Files:** All `.html`
+- **Description:** No ARIA attributes, no `role`, no descriptive labels
+- **Impact:** Inaccessible to users with disabilities
+- **Solution:** Add `aria-label`, `role="img"`, etc.
 
-### **16. Canvas avec interpolation incorrecte**
+### **16. Canvas with incorrect interpolation**
 
-- **Fichiers :** `country.component.html`, `home.component.html`
-- **Description :** `<canvas>{{ lineChart }}</canvas>` (syntaxe incorrecte pour canvas)
-- **Impact :** Affichage inattendu, pas l'usage prévu d'un canvas
-- **Solution :** Utiliser `<canvas #chartCanvas></canvas>`
+- **Files:** `country.component.html`, `home.component.html`
+- **Description:** `<canvas>{{ lineChart }}</canvas>` (incorrect syntax for canvas)
+- **Impact:** Unexpected display, not intended canvas usage
+- **Solution:** Use `<canvas #chartCanvas></canvas>`
 
-### **17. Titre H2 au lieu de H1**
+### **17. H2 title instead of H1**
 
-- **Fichiers :** `home.component.html`
-- **Description :** `<h2>Olympic games app</h2>` comme titre principal de page
-- **Impact :** Mauvais pour SEO et hiérarchie des titres
-- **Solution :** Utiliser `<h1>` pour le titre principal
+- **Files:** `home.component.html`
+- **Description:** `<h2>Olympic games app</h2>` as main page title
+- **Impact:** Bad for SEO and title hierarchy
+- **Solution:** Use `<h1>` for main title
 
-### **18. Balise `<hr/>` orpheline**
+### **18. Orphan `<hr/>` tag**
 
-- **Fichiers :** `home.component.html`
-- **Description :** `<hr/>` utilisée pour décoration visuelle
-- **Impact :** Mauvaise sémantique, devrait être géré en CSS
-- **Solution :** Supprimer et utiliser CSS pour la séparation visuelle
+- **Files:** `home.component.html`
+- **Description:** `<hr/>` used for visual decoration
+- **Impact:** Poor semantics, should be handled in CSS
+- **Solution:** Remove and use CSS for visual separation
 
-### **19. Texte peu clair**
+### **19. Unclear text**
 
-- **Fichiers :** `home.component.html`
-- **Description :** Abréviation "JOs" non explicite pour utilisateurs internationaux
-- **Impact :** Confusion possible, mauvaise UX
-- **Solution :** Écrire "Olympic Games" ou utiliser `<abbr>`
+- **Files:** `home.component.html`
+- **Description:** "JOs" abbreviation not explicit for international users
+- **Impact:** Possible confusion, poor UX
+- **Solution:** Write "Olympic Games" or use `<abbr>`
 
-### **20. Variables déclarées mais inutilisées**
+### **20. Declared but unused variables**
 
-- **Fichiers :** `country.component.ts`, `home.component.ts`
-- **Description :** `public error!: string;` déclaré mais jamais affiché
-- **Impact :** Code mort, confusion pour les développeurs
-- **Solution :** Supprimer, afficher ou rendre `private` si usage interne uniquement
+- **Files:** `country.component.ts`, `home.component.ts`
+- **Description:** `public error!: string;` declared but never displayed
+- **Impact:** Dead code, developer confusion
+- **Solution:** Remove, display, or make `private` if internal use only
 
-### **21. Pipe vide sans opérateurs**
+### **21. Empty pipe without operators**
 
-- **Fichiers :** `country.component.ts` (l.22)
-- **Description :** `.pipe().subscribe()` sans opérateurs RxJS
-- **Impact :** Code inutile, confusion
-- **Solution :** Supprimer `.pipe()`
+- **Files:** `country.component.ts` (l.22)
+- **Description:** `.pipe().subscribe()` without RxJS operators
+- **Impact:** Useless code, confusion
+- **Solution:** Remove `.pipe()`
 
-### **22. Inconsistances de formatage**
+### **22. Formatting inconsistencies**
 
-- **Fichiers :** Plusieurs fichiers (ex : `home.component.ts`)
-- **Description :** Espaces avant `:`, quotes mixtes (simple/double), indentation variable
-- **Impact :** Lisibilité réduite, code non professionnel
-- **Solution :** Utiliser Prettier ou ESLint avec config stricte
+- **Files:** Multiple files (e.g., `home.component.ts`)
+- **Description:** Spaces before `:`, mixed quotes (single/double), variable indentation
+- **Impact:** Reduced readability, unprofessional code
+- **Solution:** Use Prettier or ESLint with strict config
 
-### **23. Noms de variables non descriptifs**
+### **23. Non-descriptive variable names**
 
-- **Fichiers :** `country.component.ts` (l.30), `home.component.ts`(l.29)
-- **Description :** Variable `i` réutilisée 3 fois avec significations différentes
-- **Impact :** Code difficile à comprendre
-- **Solution :** Utiliser noms descriptifs : `country`, `participation`, `medalCount`
+- **Files:** `country.component.ts` (l.30), `home.component.ts`(l.29)
+- **Description:** Variable `i` reused 3 times with different meanings
+- **Impact:** Difficult to understand code
+- **Solution:** Use descriptive names: `country`, `participation`, `medalCount`
 
 ---
 
-## **Exercice 2**
+## **Exercise 2**
 
-### **1. ARBORESCENCE PROPOSÉE**
+### **1. PROPOSED FILE STRUCTURE**
 
 ```
 src/
 └── app/
     ├── core/
     │   ├── services/
-    │   │   ├── olympic.service.ts               # Service principal (data access + business logic)
+    │   │   ├── olympic.service.ts               # Main service (data access + business logic)
     │   ├── models/
     │   │   └── olympic.model.ts                 # TypeScript Interfaces (Olympic, Participation)
     │   └── constants/
-    │       └── chart.constants.ts               # Constants (colors, configs Chart.js)
+    │       └── chart.constants.ts               # Constants (colors, Chart.js configs)
     │
-    ├── shared/                                  # Composants réutilisables
+    ├── shared/                                  # Reusable components
     │   ├── components/
     │   │   ├── chart/
     │   │   │   ├── chart.component.ts
@@ -222,39 +222,39 @@ src/
 
 ```
 
-### **2. DESCRIPTION DES DOSSIERS**
+### **2. FOLDER DESCRIPTIONS**
 
-### **`core/` - Fonctionnalités globales**
+### **`core/` - Global features**
 
-**Rôle :** Contient les services, models et constantes utilisés dans **toute l'application**
+**Role:** Contains services, models and constants used throughout **the entire application**
 
-| Sous-dossier | Contenu | Responsabilité |
+| Subfolder | Content | Responsibility |
 | --- | --- | --- |
-| **`services/`** | `olympic.service.ts` | Appels HTTP + logique métier (calculs, agrégations) |
-| **`models/`** | `olympic.model.ts` | Interfaces TypeScript (typage fort) |
-| **`constants/`** | `chart.constants.ts` | Valeurs réutilisables (couleurs, configs) |
+| **`services/`** | `olympic.service.ts` | HTTP calls + business logic (calculations, aggregations) |
+| **`models/`** | `olympic.model.ts` | TypeScript interfaces (strong typing) |
+| **`constants/`** | `chart.constants.ts` | Reusable values (colors, configs) |
 
-### **3. PRINCIPES ET DESIGN PATTERNS APPLIQUÉS**
+### **3. PRINCIPLES AND DESIGN PATTERNS APPLIED**
 
 ### **Singleton Pattern (Services)**
 
-**Problème résolu :** Éviter la duplication d'instances de services
+**Problem solved:** Avoid duplication of service instances
 
 ### **Observer Pattern (RxJS Observables)**
 
-RxJS **utilise** l'Observer Pattern
+RxJS **uses** the Observer Pattern
 
-**Problème résolu :** Gestion asynchrone des données HTTP, /!\ gestion de l'unsubscribe
+**Problem solved:** Asynchronous HTTP data management, /!\ unsubscribe management
 
 ### **Facade Pattern**
 
-**Problème résolu :** Simplifier l'accès aux données pour les composants tout en masquant la complexité interne, composants simplifiés (présentation uniquement), logique métier centralisée et **séparation des responsabilités (SoC)**
+**Problem solved:** Simplify data access for components while hiding internal complexity, simplified components (presentation only), centralized business logic and **Separation of Concerns (SoC)**
 
 ### **Separation of Concerns (SoC)**
 
-**Problème résolu :** Mélange de responsabilités dans les composants
+**Problem solved:** Mixed responsibilities in components
 
-**Architecture en couches :**
+**Layered architecture:**
 
 ```
 ┌─────────────────────────────────────┐

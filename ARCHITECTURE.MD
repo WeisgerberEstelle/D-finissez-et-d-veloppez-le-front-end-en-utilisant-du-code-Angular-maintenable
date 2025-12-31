@@ -1,126 +1,141 @@
 # ARCHITECTURE - TéléSport Olympic App
 
-## 📋 Table des matières
-- [Vue d'ensemble](#vue-densemble)
-- [Arborescence des dossiers](#arborescence-des-dossiers)
-- [Composants](#composants)
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Folder Structure](#folder-structure)
+- [Components](#components)
 - [Services](#services)
-- [Models et Types](#models-et-types)
-- [Flux de données](#flux-de-données)
-- [Préparation API](#préparation-api)
+- [Models and Types](#models-and-types)
+- [Data Flow](#data-flow)
+- [API Preparation](#api-preparation)
 ---
 
-## 🎯 Vue d'ensemble
+## 🎯 Overview
 
-Cette application Angular affiche les performances des pays aux Jeux Olympiques avec :
-- Un **dashboard** présentant un graphique pie et des statistiques globales
-- Une **page détail** pour chaque pays avec un graphique line et des statistiques spécifiques
-- Une architecture modulaire, scalable et prête pour l'intégration d'une API REST
+This Angular application displays Olympic performance data by country with:
+- A **dashboard** featuring a pie chart and global statistics
+- A **detail page** for each country with a line chart and specific statistics
+- A modular, scalable architecture ready for REST API integration
 
 ### Technologies
 - **Angular 18** (standalone components)
-- **Chart.js** pour les graphiques
-- **RxJS** pour la gestion de l'asynchrone
-- **TypeScript** pour le typage strict
+- **Chart.js** for charts
+- **RxJS** for asynchronous management
+- **TypeScript** for strict typing
 ---
 
-## 📁 Arborescence des dossiers
+## 📁 Folder Structure
 ```
 src/app/
 ├── core/                           
-│   ├── services/                   # Fonctionnalités singleton (chargées une seule fois)
-│   │   └── olympic.service.ts      # Gestion logique métier
-│   │   └── data.service.ts         # Gestion données
+│   ├── services/                   # Singleton features (loaded once)
+│   │   ├── olympic.service.ts      # Business logic management
+│   │   └── data.service.ts         # Data management
 │   ├── models/
-│   │   └── olympic.model.ts        # Interfaces TypeScript (Olympic, Participation, Stat)
+│   │   ├── olympic.model.ts        # TypeScript interfaces (Olympic, Participation, Stat)
+│   │   └── page-state.model.ts     # Page state type
 │   └── constants/
-│       └── chart.constants.ts      # Constantes (couleurs, configs Chart.js)
+│       └── chart.constants.ts      # Constants (colors, Chart.js configs)
 │
-├── shared/                         # Composants/directives réutilisables
+├── shared/                         # Reusable components/directives
 │   └── components/
-│       ├── chart/                  # Composant Chart.js réutilisable (pie/line)
-│       ├── header/                 # En-tête de page avec titre et stats
-│       └── spinner/                # Indicateur de chargement
+│       ├── chart/                  # Reusable Chart.js component (pie/line)
+│       ├── header/                 # Page header with title and stats
+│       ├── spinner/                # Loading indicator
+│       ├── stat-card/              # Statistics card
+│       └── page-state/             # Page states (loading/error/empty)
 │
-├── pages/                          # Pages de l'application (routes)
-│   ├── home/                       # Dashboard avec graphique pie
-│   ├── country/                    # Détails d'un pays avec graphique line
-│   └── not-found/                  # Page 404
+├── pages/                          # Application pages (routes)
+│   ├── home/                       # Dashboard with pie chart
+│   ├── country/                    # Country details with line chart
+│   └── not-found/                  # 404 page
 │
-├── app.component.ts                # Composant racine avec header global
-├── app.config.ts                   # Configuration de l'application
-└── app.routes.ts                   # Configuration du routing
+├── app.component.ts                # Root component with global header
+├── app.config.ts                   # Application configuration
+└── app.routes.ts                   # Routing configuration
 
 assets/
 └── mock/
-    └── olympic.json                # Données mockées (remplacé par API en production)
+    └── olympic.json                # Mock data (replaced by API in production)
 ```
 ---
 
-## 🧩 Composants
+## 🧩 Components
 
 ### **Pages (Routes)**
 
 #### **HomeComponent** (`pages/home/`)
-- **Route :** `/`
-- **Rôle :** Affiche le dashboard principal
+- **Route:** `/`
+- **Role:** Displays the main dashboard
 
 #### **CountryComponent** (`pages/country/`)
-- **Route :** `/country/:countryName`
-- **Rôle :** Affiche les détails d'un pays spécifique
+- **Route:** `/country/:id`
+- **Role:** Displays details for a specific country
 
 #### **NotFoundComponent** (`pages/not-found/`)
-- **Route :** `/not-found` et `**` (wildcard)
-- **Rôle :** Affiche une page 404
+- **Route:** `/not-found` and `**` (wildcard)
+- **Role:** Displays a 404 page
 ---
 
-### **Composants partagés (Shared)**
+### **Shared Components**
 
 #### **HeaderComponent** (`shared/components/header/`)
-- **Sélecteur :** `<app-header>`
-- **Rôle :** Affiche un titre et une liste de statistiques
+- **Selector:** `<app-header>`
+- **Role:** Displays a title and a list of statistics
 
 #### **ChartComponent** (`shared/components/chart/`)
-- **Sélecteur :** `<app-chart>`
-- **Rôle :** Composant Chart.js réutilisable (pie ou line)
-- **Fonctionnalités :**
-  - Gestion du cycle de vie (AfterViewInit, OnDestroy)
-  - Destruction du graphique pour éviter les memory leaks
-  - Responsive (détection mobile)
+- **Selector:** `<app-chart>`
+- **Role:** Reusable Chart.js component (pie or line)
+- **Features:**
+  - Lifecycle management (AfterViewInit, OnDestroy)
+  - Chart destruction to prevent memory leaks
+  - Responsive (mobile detection)
 
 #### **SpinnerComponent** (`shared/components/spinner/`)
-- **Sélecteur :** `<app-spinner>`
-- **Rôle :** Indicateur de chargement animé
+- **Selector:** `<app-spinner>`
+- **Role:** Animated loading indicator
+
+#### **StatCardComponent** (`shared/components/stat-card/`)
+- **Selector:** `<app-stat-card>`
+- **Role:** Displays a single statistic card
+
+#### **PageStateComponent** (`shared/components/page-state/`)
+- **Selector:** `<app-page-state>`
+- **Role:** Manages page states (loading, error, empty data)
+- **Features:**
+  - Centralized state management
+  - Consistent error handling across pages
+  - ARIA live regions for accessibility
 ---
 
 ## 🔧 Services
 
 ### **DataService** (`services/data.service.ts`)
-- **Rôle :** Façade d'accès aux données (couche d'abstraction)
-- **Responsabilité :** Point d'entrée unique pour les composants
-- **Provider :** `providedIn: 'root'` (Singleton)
-- **Méthodes principales :**
-  - `getOlympics(): Observable<Olympic[]>` - Récupère toutes les données
+- **Role:** Data access facade (abstraction layer)
+- **Responsibility:** Single entry point for components
+- **Provider:** `providedIn: 'root'` (Singleton)
+- **Main Methods:**
+  - `getOlympics(): Observable<Olympic[]>` - Fetches all data
 
-**Pourquoi cette couche ?**
-- Abstraction : Les composants ne connaissent pas la source des données
-- Futur : Facile de remplacer par des appels API réels
-- Testabilité : Facile à mocker dans les tests
+**Why this layer?**
+- Abstraction: Components don't know the data source
+- Future-proof: Easy to replace with real API calls
+- Testability: Easy to mock in tests
 
 ### **OlympicService** (`core/services/olympic.service.ts`)
-- **Rôle :** Gestion des données olympiques et logique métier
-- **Responsabilité :**
-  - Logique métier (calculs, agrégations, transformations)
-- **Provider :** `providedIn: 'root'` (Singleton)
-- **Méthodes principales :**
-  - `getOlympics(): Observable<Olympic[]>` - Charge les données depuis DataService
-  - `calculateTotalMedals()` - Calcule le total de médailles
-  - `calculateTotalAthletes()` - Calcule le total d'athlètes
-  - `getTotalEntries()` - Compte le nombre de participations
+- **Role:** Olympic data management and business logic
+- **Responsibility:**
+  - Business logic (calculations, aggregations, transformations)
+- **Provider:** `providedIn: 'root'` (Singleton)
+- **Main Methods:**
+  - `getOlympics(): Observable<Olympic[]>` - Loads data from DataService
+  - `calculateTotalMedals()` - Calculates total medals
+  - `calculateTotalAthletes()` - Calculates total athletes
+  - `getUniqueYears()` - Returns unique Olympic years
 
-## 🔄 Flux de données
+## 🔄 Data Flow
 
-### **Scénario : Affichage du dashboard (Home)**
+### **Scenario: Dashboard Display (Home)**
 ```
 1. HomeComponent.ngOnInit()
    ↓
@@ -130,88 +145,99 @@ assets/
    ↓
 4. HttpClient.get('assets/mock/olympic.json')
    ↓
-5. Retour Observable<Olympic[]>
+5. Return Observable<Olympic[]>
    ↓
 6. HomeComponent.handleOlympicData(data)
    ↓
-7. Mise à jour des propriétés (chartLabels, chartData, stats)
+7. Update properties (chartLabels, chartData, stats)
    ↓
-8. Rendu du template (HeaderComponent, ChartComponent)
+8. Template rendering (HeaderComponent, ChartComponent)
 ```
 
-## 🚀 Préparation API
+## 🚀 API Preparation
 
-### **Migration vers une API REST (futur)**
+### **Migration to REST API (future)**
 
-L'architecture actuelle facilite la migration vers une API :
+The current architecture facilitates migration to an API:
 
-#### **Changements nécessaires (minimes) :**
+#### **Required Changes (minimal):**
 
-**1. Modifier l'URL dans DataService :**
+**1. Modify URL in DataService:**
 ```typescript
-// AVANT (JSON local)
+// BEFORE (local JSON)
 private apiUrl = './assets/mock/olympic.json';
 
-// APRÈS (API REST)
+// AFTER (REST API)
 private apiUrl = 'https://api.example.com/olympics';
 ```
 
-**2. Les composants n'ont AUCUN changement à faire** ✅
-- Ils passent toujours par les services
-- La source de données (JSON ou API) est transparente
-
-**Avantages :**
-- ✅ Séparation des responsabilités (SoC)
-- ✅ Testabilité (mock facile du DataService)
-- ✅ Scalabilité
+**2. Components require NO changes** ✅
+- They always go through services
+- Data source (JSON or API) is transparent
 ---
 
-## 🏗️ Design Patterns appliqués
+## 🏗️ Applied Design Patterns
 
 ### **1. Singleton Pattern**
-- Services avec `providedIn: 'root'`
-- Une seule instance partagée dans toute l'application
+- Services with `providedIn: 'root'`
+- Single instance shared throughout the application
 
 ### **2. Observer Pattern**
-- Utilisation de RxJS Observables pour les données asynchrones
-- Gestion des subscriptions avec `takeUntilDestroyed()`
+- Use of RxJS Observables for asynchronous data
+- Subscription management with `takeUntilDestroyed()`
 
 ### **3. Facade Pattern**
-- `DataService` comme façade simplifiant l'accès aux données
-- Composants ne connaissent pas la complexité interne
+- `DataService` as a facade simplifying data access
+- Components don't know internal complexity
 
 ### **4. Separation of Concerns**
-- Composants : Affichage uniquement
-- Services : Logique métier et accès données
-- Models : Typage et structure des données
+- Components: Display only
+- Services: Business logic and data access
+- Models: Typing and data structure
+
+### **5. Component Composition**
+- Reusable components (`ChartComponent`, `PageStateComponent`)
+- Single Responsibility Principle applied
+- Promotes code reuse and maintainability
 ---
 
-### **Comment démarrer ?**
+### **Implemented Features**
+- ✅ **Semantic HTML**: `<main>`, `<header>`, `<figure>`, `<figcaption>`
+- ✅ **ARIA attributes**: `role`, `aria-label`, `aria-live`, `aria-describedby`
+- ✅ **Keyboard navigation**: All interactive elements accessible via Tab
+- ✅ **Visible focus states**: Clear outline on focused elements
+- ✅ **Screen reader support**: Descriptive text for charts and states
+- ✅ **Color contrast**: AA compliant (minimum 4.5:1)
+
+---
+
+### **Getting Started**
 ```bash
-# Installer les dépendances
+# Install dependencies
 npm install
 
-# Lancer l'application
+# Run the application
 ng serve
 
-# Ouvrir dans le navigateur
+# Open in browser
 http://localhost:4200
 ```
 
-### **Conventions de code :**
-- ✅ Typage strict TypeScript (pas de `any`)
-- ✅ Interfaces pour toutes les données
-- ✅ Gestion des subscriptions (takeUntilDestroyed)
-- ✅ Nommage en anglais
-- ✅ Composants standalone
+### **Code Conventions**
+- ✅ Strict TypeScript typing (no `any`)
+- ✅ Interfaces for all data
+- ✅ Subscription management (takeUntilDestroyed)
+- ✅ English naming
+- ✅ Standalone components
 ---
 
-## 📚 Ressources
+## 📚 Resources
 
 - [Angular Documentation](https://angular.dev)
 - [Chart.js Documentation](https://www.chartjs.org)
 - [RxJS Documentation](https://rxjs.dev)
+- [WCAG Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 ---
 
-**Date de dernière mise à jour :** 28/12/2024  
-**Version de l'application :** 1.0.0 
+**Last Updated:** December 30, 2025  
+**Application Version:** 1.0.0
