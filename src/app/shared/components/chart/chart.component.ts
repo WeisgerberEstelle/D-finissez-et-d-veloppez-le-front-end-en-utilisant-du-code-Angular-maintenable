@@ -10,10 +10,11 @@ import {
 } from '@angular/core';
 import {
   Chart,
-  ChartConfiguration,
+  ChartConfiguration
 } from 'chart.js/auto';
 import { CHART_COLORS, CHART_CONFIG } from '../../../core/constants/chart.constants';
-import { ChartItem } from 'src/app/core/models/olympic.model';
+import { ChartItem, ChartType } from 'src/app/core/models/olympic.model';
+import { MOBILE_BREAKPOINT } from 'src/app/core/constants/app.constants';
 
 export interface ChartClickEvent {
   index: number;
@@ -29,14 +30,15 @@ export interface ChartClickEvent {
 export class ChartComponent implements AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas') chartCanvas?: ElementRef<HTMLCanvasElement>;
 
-  @Input() type: 'line' | 'pie' = 'line';
+  @Input() type: ChartType = 'line';
   @Input() chartData: ChartItem[] = [];
   @Input() label: string = 'Medals';
+  @Input() xAxisLabel?: string;
+  @Input() yAxisLabel?: string;
 
   @Output() chartClick = new EventEmitter<ChartClickEvent>();
 
   private chart?: Chart;
-  public chartDescription: string = '';
 
   ngAfterViewInit(): void {
     if (this.chartData.length > 0) {
@@ -60,18 +62,17 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       ? this.createPieChartConfig() 
       : this.createLineChartConfig();
 
-    this.chartDescription = this.getChartDescription();
     this.chart = new Chart(ctx, config);
   }
 
-  private getCommonChartData() {
+  private getCommonChartData(): { labels: (string|number)[]; data: number[] } {
     return {
       labels: this.chartData.map(d => d.label),
       data: this.chartData.map(d => d.value)
     };
   }
 
-  private getCommonOptions() {
+  private getCommonOptions(): Partial<ChartConfiguration['options']> {
     return {
       responsive: CHART_CONFIG.responsive,
       maintainAspectRatio: true,
@@ -127,13 +128,18 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         }]
       },
       options: {
-        ...this.getCommonOptions()
+        ...this.getCommonOptions(),
+        scales: this.getAxesConfiguration(),
       }
     };
   }
 
   private isMobile(): boolean {
-    return window.innerWidth <= 1000;
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  public get chartDescription(): string {
+    return this.getChartDescription();
   }
 
   public getChartDescription(): string {
@@ -147,5 +153,28 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       .join(', ');
 
     return `${this.label} chart showing total of ${total} across ${this.chartData.length} countries. ${descriptions}.`;
+  }
+
+  private getAxesConfiguration() {
+    return {
+      x: {
+        title: {
+          display: !!this.xAxisLabel,
+          text: this.xAxisLabel || '',
+          font: {
+            size: CHART_CONFIG.axesFontSize,
+          }
+        }
+      },
+      y: {
+        title: {
+          display: !!this.yAxisLabel,
+          text: this.yAxisLabel || '',
+          font: {
+            size:CHART_CONFIG.axesFontSize
+          }
+        }
+      }
+    };
   }
 }
