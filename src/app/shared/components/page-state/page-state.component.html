@@ -1,0 +1,40 @@
+@if (state === 'loading') {
+    <div class="flex-center-m" role="status" aria-live="polite">
+      <app-spinner />
+    </div>
+  } @else if (state === 'error') {
+    <div class="error-block" role="alert" aria-live="assertive">
+      <p>{{ errorMessage }}</p>
+      @if (showReloadButton) {
+        <button 
+          (click)="reload.emit()" 
+          class="btn-reload"
+          aria-label="Reload data"
+        >
+          Reload data
+        </button>
+      }
+      @if (showBackButton) {
+        <a 
+          [routerLink]="backRoute" 
+          class="btn-back"
+          aria-label="Return to home page"
+        >
+          Back to Home
+        </a>
+      }
+    </div>
+  } @else if (state === 'empty') {
+    <div class="flex-center-column-m" role="status">
+      <p>{{ emptyMessage }}</p>
+      @if (showBackButton) {
+        <a 
+          [routerLink]="backRoute" 
+          class="btn-back"
+          aria-label="Return to home page"
+        >
+          Back to Home
+        </a>
+      }
+    </div>
+  }
