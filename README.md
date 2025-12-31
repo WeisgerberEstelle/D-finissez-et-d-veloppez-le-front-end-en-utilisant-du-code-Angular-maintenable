@@ -19,9 +19,12 @@
 
 Web application built with Angular to visualize Olympic medals by country through:
 - **main dashboard** with pie chart and global statistics
+![Dashbord desktop](<Capture d’écran 2025-12-31 à 15.22.38.png>)
+![Dashboard mobile](<Capture d’écran 2025-12-31 à 15.26.59.png>)
 - **country detail page** with medal evolution over time
+![Country details desktop](<Capture d’écran 2025-12-31 à 15.27.42.png>)
+![Country details mobile](<Capture d’écran 2025-12-31 à 15.27.12.png>)
 - **modular** and **accessible** architecture
-
 ---
 
 ## 📦 Prerequisites
