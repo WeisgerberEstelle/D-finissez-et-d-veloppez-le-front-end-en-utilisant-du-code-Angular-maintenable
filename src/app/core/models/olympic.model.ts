@@ -22,3 +22,5 @@ export interface ChartItem {
     label: number|string;
     value: number;
 }
+
+export type ChartType = 'line' | 'pie';

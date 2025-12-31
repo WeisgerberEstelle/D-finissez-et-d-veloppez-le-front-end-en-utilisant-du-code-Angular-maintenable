@@ -21,11 +21,12 @@
     </div>
   } @else {
     <div class="chart-wrapper">
-      <figure class="chart-container">
+      <figure class="chart-line-container">
         <app-chart 
-          type="line"
+          [type]="chartType"
           [chartData]="chartData"
-          label="Number of medals"
+          [label]="chartLabel"
+          [xAxisLabel]="xAxisLabel"
           aria-describedby="chart-desc">
         </app-chart>
         <figcaption id="chart-desc" class="flex-center-m">Number of medals won at the Olympic Games per year.</figcaption>

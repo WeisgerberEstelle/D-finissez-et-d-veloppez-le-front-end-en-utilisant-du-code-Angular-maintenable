@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { ChartItem, Stat } from 'src/app/core/models/olympic.model';
+import { ChartItem, ChartType, Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
 import { ChartComponent } from 'src/app/shared/components/chart/chart.component';
@@ -27,8 +27,10 @@ export class CountryComponent implements OnInit {
   public titlePage: string = '';
   public stats: Stat[] = [];
   public error!: string;
-  public isLoading = true;
-
+  public isLoading: boolean = true;
+  public readonly chartLabel: string = 'Number of medals';
+  public readonly xAxisLabel: string = 'Dates';
+  public readonly chartType: ChartType = 'line';
   public chartData: ChartItem[] = [];
 
   private destroyRef = inject(DestroyRef);

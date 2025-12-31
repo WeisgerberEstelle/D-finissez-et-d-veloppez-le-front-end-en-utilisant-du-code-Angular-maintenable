@@ -17,13 +17,12 @@
   } @else {
     <div class="chart-wrapper">
       <figure 
-        class="chart-container"
+        class="chart-pie-container"
         role="img" 
         aria-describedby="chart-desc">
           <app-chart
-            type="pie"
+            [type]="chartType"
             [chartData]="chartData"
-            label="Medals"
             (chartClick)="onCountryClick($event)"
           />
         <figcaption id="chart-desc" class="center">
