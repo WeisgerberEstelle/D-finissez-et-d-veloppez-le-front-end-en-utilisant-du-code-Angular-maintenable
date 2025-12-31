@@ -1,0 +1,1 @@
+export type PageState = 'loading' | 'error' | 'empty' | 'success';
