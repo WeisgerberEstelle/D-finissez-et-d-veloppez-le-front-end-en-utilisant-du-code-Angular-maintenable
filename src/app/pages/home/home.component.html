@@ -1,30 +1,27 @@
 <main class="home-container">
-  <app-header [title]="titlePage" [stats]="stats" />
-
-  @if (isLoading) {
-    <div class="flex-center-m" role="status" aria-live="polite">
-      <app-spinner />
-    </div>
-  } @else if (error) {
-    <div class="error-block" role="alert" aria-live="assertive">
-      <p>{{ error }}</p>
-      <button (click)="reloadData()" aria-label="Reload Olympic data">Reload data</button>
-    </div>
-  } @else if (chartData.length === 0) {
-    <div class="flex-center-m" role="status">
-      <p>No data available</p>
-    </div>
+  <app-header [title]="titlePage" [stats]="stats"></app-header>
+  
+  @if (pageState !== 'success') {
+    <app-page-state
+      [state]="pageState"
+      [errorMessage]="error"
+      [emptyMessage]="'No data available'"
+      [showReloadButton]="true"
+      (reload)="reloadData()"
+    />
   } @else {
     <div class="chart-wrapper">
       <figure 
         class="chart-pie-container"
         role="img" 
-        aria-describedby="chart-desc">
-          <app-chart
-            [type]="chartType"
-            [chartData]="chartData"
-            (chartClick)="onCountryClick($event)"
-          />
+        aria-describedby="chart-desc"
+      >
+        <app-chart
+          [type]="chartType"
+          [chartData]="chartData"
+          (chartClick)="onCountryClick($event)"
+        ></app-chart>
+        
         <figcaption id="chart-desc" class="center">
           Medal distribution by country at the Olympic Games
         </figcaption>
