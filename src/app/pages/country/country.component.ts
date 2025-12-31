@@ -7,8 +7,9 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { ChartItem, ChartType, Stat } from 'src/app/core/models/olympic.model';
 import { Olympic, Participation } from '../../core/models/olympic.model';
-import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
 import { ChartComponent } from 'src/app/shared/components/chart/chart.component';
+import { PageState } from 'src/app/core/models/page-state.model';
+import { PageStateComponent } from 'src/app/shared/components/page-state/page-state.component';
 
 @Component({
   selector: 'app-country',
@@ -19,15 +20,15 @@ import { ChartComponent } from 'src/app/shared/components/chart/chart.component'
     HeaderComponent, 
     RouterLink, 
     CommonModule, 
-    SpinnerComponent,
+    PageStateComponent,
     ChartComponent
   ],
 })
 export class CountryComponent implements OnInit {
   public titlePage: string = '';
   public stats: Stat[] = [];
-  public error!: string;
-  public isLoading: boolean = true;
+  public error: string | null = null;
+  public pageState: PageState = 'loading';
   public readonly chartLabel: string = 'Number of medals';
   public readonly xAxisLabel: string = 'Dates';
   public readonly chartType: ChartType = 'line';
@@ -73,7 +74,7 @@ export class CountryComponent implements OnInit {
 
   private handleCountryData(data: Olympic[], countryId: number): void {
     if (!data || data.length === 0) {
-      this.isLoading = false;
+      this.pageState = 'empty';
       return;
     }
 
@@ -98,7 +99,7 @@ export class CountryComponent implements OnInit {
       value: p.medalsCount
     }));
     
-    this.isLoading = false;
+    this.pageState = 'success';
   }
 
   private buildStats(
@@ -124,6 +125,6 @@ export class CountryComponent implements OnInit {
 
   private handleError(): void {
     this.error = 'Unable to retrieve country statistics';
-    this.isLoading = false;
+    this.pageState = 'error';
   }
 }
