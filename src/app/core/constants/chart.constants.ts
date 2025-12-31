@@ -22,5 +22,6 @@ export const CHART_CONFIG = {
       default: 2.5,
       mobile: 2.5
     }
-  }
+  },
+  axesFontSize: 24
 } as const;
