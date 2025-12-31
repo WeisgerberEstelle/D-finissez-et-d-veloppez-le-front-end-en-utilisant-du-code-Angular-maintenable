@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { ChartItem, Olympic, Stat } from 'src/app/core/models/olympic.model';
+import { ChartItem, ChartType, Olympic, Stat } from 'src/app/core/models/olympic.model';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.component';
@@ -23,6 +23,7 @@ export class HomeComponent implements OnInit {
   public stats: Stat[] = [];
   public isLoading: boolean = true;
   public chartData: ChartItem[] = [];
+  public readonly chartType: ChartType = 'pie';
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
@@ -70,7 +71,7 @@ export class HomeComponent implements OnInit {
         value: totalCountries,
       },
       {
-        label: 'Number of JOs',
+        label: 'Number of Olympic Games',
         value: totalJOs,
       },
     ];
